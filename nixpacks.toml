@@ -1,13 +1,22 @@
-# Tells Railway's Nixpacks builder to install build tools so that
-# better-sqlite3's native module compiles cleanly.
+# Nixpacks build config for Railway
+# - Native deps for better-sqlite3 (python/gcc)
+# - npm install (NOT npm ci) to avoid Nixpacks BuildKit cache mount conflict
+#   that triggers EBUSY when npm ci tries to wipe node_modules
+# - Move npm cache outside /app to dodge the locked .cache dir
+
 [phases.setup]
 nixPkgs = ["nodejs_20", "python3", "gcc", "gnumake"]
 
 [phases.install]
-cmds = ["npm ci"]
+cmds = ["npm install --prefer-offline --no-audit --no-fund"]
 
 [phases.build]
 cmds = ["npm run build"]
 
 [start]
 cmd = "npm start"
+
+[variables]
+NPM_CONFIG_CACHE = "/tmp/.npm"
+NPM_CONFIG_FUND = "false"
+NPM_CONFIG_AUDIT = "false"
