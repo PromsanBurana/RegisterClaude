@@ -1,9 +1,11 @@
 import { useRef, useState } from 'react';
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
+import Chapter01Problem from '../components/landing/Chapter01Problem';
+import Chapter02Shift from '../components/landing/Chapter02Shift';
+import ScrollStory from '../components/landing/ScrollStory';
 import Courses from '../components/Courses';
 import ExampleWork from '../components/ExampleWork';
-import WhyJoin from '../components/WhyJoin';
 import RegistrationForm, {
   type RegistrationData,
 } from '../components/RegistrationForm';
@@ -36,9 +38,11 @@ export default function Landing() {
       <Navbar />
       <main>
         <Hero />
+        <Chapter01Problem />
+        <Chapter02Shift />
+        <ScrollStory />
         <Courses onSelect={handleSelectCourse} />
         <ExampleWork />
-        <WhyJoin />
         <RegistrationForm
           ref={formRef}
           selectedCourseId={selectedCourseId}

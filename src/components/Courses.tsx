@@ -7,6 +7,7 @@ import Button from './ui/Button';
 import Badge from './ui/Badge';
 import TiltCard from './ui/TiltCard';
 import MarqueeText from './ui/MarqueeText';
+import ChapterMarker from './landing/ChapterMarker';
 
 type Props = {
   onSelect: (courseId: string) => void;
@@ -42,8 +43,11 @@ export default function Courses({ onSelect }: Props) {
       />
       <Section id="courses" tone="bg">
         <Container>
+          <div className="mb-6">
+            <ChapterMarker number="03" label="The Workshops" />
+          </div>
           <SectionHeader
-            eyebrow="The lineup"
+            eyebrow="Choose your track"
             title={
               <>
                 Two courses,

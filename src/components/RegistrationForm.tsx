@@ -8,6 +8,7 @@ import SectionHeader from './ui/SectionHeader';
 import Button from './ui/Button';
 import { Input, Textarea, Select, FormField } from './ui/Input';
 import MeshBackdrop from './ui/MeshBackdrop';
+import ChapterMarker from './landing/ChapterMarker';
 
 export type RegistrationData = {
   fullName: string;
@@ -153,6 +154,9 @@ const RegistrationForm = forwardRef<HTMLElement, Props>(
       <Section id="register" ref={ref} tone="bg" className="overflow-hidden">
         <MeshBackdrop intensity="subtle" />
         <Container size="lg" className="relative">
+          <div className="flex justify-center mb-6">
+            <ChapterMarker number="04" label="Final scene · Apply" />
+          </div>
           <SectionHeader
             align="center"
             eyebrow="Apply"

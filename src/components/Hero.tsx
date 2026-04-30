@@ -6,6 +6,7 @@ import FloatingShapes from './ui/FloatingShapes';
 import AnimatedHeadline from './ui/AnimatedHeadline';
 import MagneticButton from './ui/MagneticButton';
 import CountUp from './ui/CountUp';
+import ScrollCue from './ui/ScrollCue';
 
 const STATS: Array<{ value: string; label: string; padStart?: number }> = [
   { value: '02', label: 'Courses', padStart: 2 },
@@ -42,7 +43,7 @@ export default function Hero() {
   return (
     <section
       id="top"
-      className="relative overflow-hidden bg-bg pt-32 pb-20 sm:pt-40 sm:pb-28 lg:pt-44 lg:pb-32"
+      className="relative min-h-screen flex flex-col overflow-hidden bg-bg pt-28 pb-12 sm:pt-32"
     >
       {/* Mouse-parallax mesh */}
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -82,7 +83,7 @@ export default function Hero() {
       </div>
       <FloatingShapes />
 
-      <Container size="xl" className="relative">
+      <Container size="xl" className="relative flex-1 flex flex-col justify-center pt-12 sm:pt-16">
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 6 }}
@@ -103,7 +104,7 @@ export default function Hero() {
               startDelay={0.05}
               charStagger={0.022}
               lines={[
-                ['Build', 'cool', 'stuff'],
+                ['Build', 'real', 'things'],
                 ['with', { text: 'AI.', gradient: 'rainbow' }],
               ]}
             />
@@ -112,19 +113,19 @@ export default function Hero() {
           <motion.p
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
+            transition={{ duration: 0.6, delay: 0.7 }}
             className="mt-7 max-w-2xl text-base sm:text-lg lg:text-xl text-fg-secondary leading-relaxed text-balance"
           >
-            เวิร์กช็อปสำหรับคนที่อยากเล่นกับ{' '}
+            เวิร์กช็อปสำหรับคนที่อยากเปลี่ยนไอเดียให้กลายเป็น
+            ระบบจริง — ด้วย{' '}
             <span className="font-semibold text-ink">Claude Code</span> และ{' '}
-            <span className="font-semibold text-ink">Claude Cowork</span> —
-            เปลี่ยนไอเดียเป็นของจริงในคลาสเดียว
+            <span className="font-semibold text-ink">Claude Cowork</span>
           </motion.p>
 
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.7 }}
+            transition={{ duration: 0.6, delay: 0.85 }}
             className="mt-9 flex flex-col sm:flex-row items-stretch sm:items-center gap-3"
           >
             <MagneticButton strength={0.3}>
@@ -143,7 +144,7 @@ export default function Hero() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.85 }}
+            transition={{ duration: 0.6, delay: 1 }}
             className="mt-12 flex flex-wrap items-center justify-center gap-x-7 gap-y-3 text-xs text-fg-muted"
           >
             <Trust label="Format" value="Live · hands-on" />
@@ -154,38 +155,44 @@ export default function Hero() {
           </motion.div>
         </div>
 
-        {/* Stats with count-up + subtle stagger rotation */}
-        <motion.div
-          initial="hidden"
-          animate="show"
-          variants={{
-            hidden: {},
-            show: {
-              transition: { staggerChildren: 0.08, delayChildren: 0.95 },
-            },
-          }}
-          className="mt-20 sm:mt-24 grid grid-cols-2 lg:grid-cols-4 gap-3"
-        >
-          {STATS.map((s) => (
-            <motion.div
-              key={s.label}
-              variants={{
-                hidden: { opacity: 0, y: 16 },
-                show: { opacity: 1, y: 0 },
-              }}
-              transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-              whileHover={{ y: -4, scale: 1.01 }}
-              className="rounded-2xl border border-line bg-surface/85 backdrop-blur p-5 sm:p-6 shadow-soft transition-shadow hover:shadow-card"
-            >
-              <p className="text-3xl sm:text-4xl font-bold tracking-tight text-ink tabular-nums">
-                <CountUp value={s.value} padStart={s.padStart} duration={1.6} />
-              </p>
-              <p className="mt-2 text-xs sm:text-sm text-fg-muted">
-                {s.label}
-              </p>
-            </motion.div>
-          ))}
-        </motion.div>
+        {/* Stats + scroll cue at bottom */}
+        <div className="mt-16 sm:mt-20">
+          <motion.div
+            initial="hidden"
+            animate="show"
+            variants={{
+              hidden: {},
+              show: {
+                transition: { staggerChildren: 0.08, delayChildren: 1.05 },
+              },
+            }}
+            className="grid grid-cols-2 lg:grid-cols-4 gap-3"
+          >
+            {STATS.map((s) => (
+              <motion.div
+                key={s.label}
+                variants={{
+                  hidden: { opacity: 0, y: 16 },
+                  show: { opacity: 1, y: 0 },
+                }}
+                transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+                whileHover={{ y: -4, scale: 1.01 }}
+                className="rounded-2xl border border-line bg-surface/85 backdrop-blur p-5 sm:p-6 shadow-soft transition-shadow hover:shadow-card"
+              >
+                <p className="text-3xl sm:text-4xl font-bold tracking-tight text-ink tabular-nums">
+                  <CountUp value={s.value} padStart={s.padStart} duration={1.6} />
+                </p>
+                <p className="mt-2 text-xs sm:text-sm text-fg-muted">
+                  {s.label}
+                </p>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          <div className="mt-10 sm:mt-12 flex justify-center">
+            <ScrollCue />
+          </div>
+        </div>
       </Container>
     </section>
   );
