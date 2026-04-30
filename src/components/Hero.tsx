@@ -103,8 +103,8 @@ export default function Hero() {
               startDelay={0.05}
               charStagger={0.022}
               lines={[
-                ['Build', 'cool', 'stuff', 'with'],
-                [{ text: 'Claude Code.', gradient: 'brand' }],
+                ['Build', 'cool', 'stuff'],
+                ['with', { text: 'AI.', gradient: 'brand' }],
               ]}
             />
           </div>
