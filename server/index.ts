@@ -3,7 +3,11 @@ import express, { type Request, type Response, type NextFunction } from 'express
 import cors from 'cors';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { pool, initSchema } from './db.js';
+import {
+  insertRegistration,
+  listRegistrations,
+  countRegistrations,
+} from './db.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -24,10 +28,14 @@ function trim(v: unknown, max: number): string {
 }
 
 app.get('/api/health', (_req, res) => {
-  res.json({ ok: true, time: new Date().toISOString() });
+  res.json({
+    ok: true,
+    time: new Date().toISOString(),
+    registrations: countRegistrations(),
+  });
 });
 
-app.post('/api/register', async (req, res) => {
+app.post('/api/register', (req, res) => {
   try {
     const fullName = trim(req.body?.fullName, 200);
     const phone = trim(req.body?.phone, 50);
@@ -52,27 +60,21 @@ app.post('/api/register', async (req, res) => {
       return res.status(400).json({ ok: false, errors });
     }
 
-    const { rows } = await pool.query(
-      `INSERT INTO registrations
-        (full_name, phone, email, company, position, course_id, batch_id, expectation)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-       RETURNING id, created_at`,
-      [
-        fullName,
-        phone,
-        email,
-        company || null,
-        position || null,
-        courseId,
-        batchId,
-        expectation || null,
-      ],
-    );
+    const row = insertRegistration({
+      fullName,
+      phone,
+      email,
+      company,
+      position,
+      courseId,
+      batchId,
+      expectation,
+    });
 
     res.status(201).json({
       ok: true,
-      id: rows[0].id,
-      createdAt: rows[0].created_at,
+      id: row.id,
+      createdAt: row.created_at,
     });
   } catch (err) {
     console.error('[register] Error:', err);
@@ -80,18 +82,13 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-app.get('/api/registrations', async (req, res) => {
+app.get('/api/registrations', (req, res) => {
   try {
     const adminToken = process.env.ADMIN_TOKEN;
     if (!adminToken || req.header('x-admin-token') !== adminToken) {
       return res.status(401).json({ ok: false, error: 'unauthorized' });
     }
-    const { rows } = await pool.query(
-      `SELECT id, full_name, phone, email, company, position, course_id, batch_id, expectation, created_at
-         FROM registrations
-         ORDER BY created_at DESC
-         LIMIT 500`,
-    );
+    const rows = listRegistrations();
     res.json({ ok: true, count: rows.length, rows });
   } catch (err) {
     console.error('[list] Error:', err);
@@ -118,10 +115,6 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
 const PORT = Number(process.env.PORT) || 3000;
 const HOST = '0.0.0.0';
 
-initSchema()
-  .catch((e) => console.error('[init] Schema init failed:', e))
-  .finally(() => {
-    app.listen(PORT, HOST, () => {
-      console.log(`[server] Listening on http://${HOST}:${PORT}`);
-    });
-  });
+app.listen(PORT, HOST, () => {
+  console.log(`[server] Listening on http://${HOST}:${PORT}`);
+});
