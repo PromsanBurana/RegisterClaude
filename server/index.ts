@@ -12,7 +12,7 @@ import {
   remove,
   type RegistrationStatus,
 } from './store.js';
-import { findCourse, findBatch, batchDisplayName } from './courses.js';
+import { COURSES, findCourse, findBatch, batchDisplayName } from './courses.js';
 import {
   attachUser,
   requireAuth,
@@ -43,6 +43,20 @@ const ALLOWED_STATUSES: ReadonlyArray<RegistrationStatus> = [
   'confirmed',
   'cancelled',
 ] as const;
+
+const BATCH_CAPACITY = 15;
+
+/** Counts active (non-cancelled) registrations per courseId::batchId. */
+async function getBatchCounts(): Promise<Map<string, number>> {
+  const all = await listAll();
+  const counts = new Map<string, number>();
+  for (const r of all) {
+    if (r.status === 'cancelled') continue;
+    const key = `${r.courseId}::${r.batchId}`;
+    counts.set(key, (counts.get(key) || 0) + 1);
+  }
+  return counts;
+}
 
 function trim(v: unknown, max: number): string {
   return typeof v === 'string' ? v.trim().slice(0, max) : '';
@@ -88,6 +102,39 @@ app.get('/api/auth/me', attachUser, (req, res) => {
   res.json({ ok: true, user: publicUser(user) });
 });
 
+// ---------- Batch availability (public) ----------
+
+app.get('/api/batches', async (_req, res) => {
+  try {
+    const counts = await getBatchCounts();
+    const result: Array<{
+      courseId: string;
+      batchId: string;
+      capacity: number;
+      count: number;
+      available: number;
+      isFull: boolean;
+    }> = [];
+    for (const c of COURSES) {
+      for (const b of c.batches) {
+        const count = counts.get(`${c.id}::${b.id}`) || 0;
+        result.push({
+          courseId: c.id,
+          batchId: b.id,
+          capacity: BATCH_CAPACITY,
+          count,
+          available: Math.max(0, BATCH_CAPACITY - count),
+          isFull: count >= BATCH_CAPACITY,
+        });
+      }
+    }
+    res.json(result);
+  } catch (err) {
+    console.error('[GET /api/batches]', err);
+    res.status(500).json({ ok: false, error: 'internal_error' });
+  }
+});
+
 // ---------- Health ----------
 
 app.get('/api/health', async (_req, res) => {
@@ -126,6 +173,17 @@ app.post('/api/registrations', async (req, res) => {
 
     if (Object.keys(errors).length > 0) {
       return res.status(400).json({ ok: false, errors });
+    }
+
+    // Capacity check — block if the chosen batch is already at the cap
+    const counts = await getBatchCounts();
+    const currentCount = counts.get(`${courseId}::${batchId}`) || 0;
+    if (currentCount >= BATCH_CAPACITY) {
+      return res.status(409).json({
+        ok: false,
+        error: 'batch_full',
+        errors: { batchId: 'batch_full' },
+      });
     }
 
     const reg = await create({

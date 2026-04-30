@@ -46,3 +46,12 @@ export const STATUS_LABEL: Record<RegistrationStatus, string> = {
   confirmed: 'ยืนยันแล้ว',
   cancelled: 'ยกเลิก',
 };
+
+export type BatchAvailability = {
+  courseId: string;
+  batchId: string;
+  capacity: number;
+  count: number;
+  available: number;
+  isFull: boolean;
+};

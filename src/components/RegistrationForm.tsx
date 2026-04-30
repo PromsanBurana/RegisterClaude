@@ -9,6 +9,10 @@ import Button from './ui/Button';
 import { Input, Textarea, Select, FormField } from './ui/Input';
 import MeshBackdrop from './ui/MeshBackdrop';
 import ChapterMarker from './landing/ChapterMarker';
+import {
+  describeAvailability,
+  type AvailabilityHelper,
+} from '../hooks/useBatchAvailability';
 
 export type RegistrationData = {
   fullName: string;
@@ -37,10 +41,11 @@ type Errors = Partial<Record<keyof RegistrationData, string>>;
 type Props = {
   selectedCourseId: string | null;
   onSuccess: (data: RegistrationData) => void;
+  availability: AvailabilityHelper;
 };
 
 const RegistrationForm = forwardRef<HTMLElement, Props>(
-  ({ selectedCourseId, onSuccess }, ref) => {
+  ({ selectedCourseId, onSuccess, availability }, ref) => {
     const [data, setData] = useState<RegistrationData>(initialData);
     const [errors, setErrors] = useState<Errors>({});
     const [touched, setTouched] = useState<Partial<Record<keyof RegistrationData, boolean>>>({});
@@ -135,12 +140,26 @@ const RegistrationForm = forwardRef<HTMLElement, Props>(
         setTouched({});
         setSubmitAttempted(false);
       } catch (err) {
-        if (err instanceof ApiError && err.fieldErrors) {
-          const mapped: Errors = {};
-          for (const k of Object.keys(err.fieldErrors) as (keyof RegistrationData)[]) {
-            mapped[k] = 'ข้อมูลไม่ถูกต้อง';
+        if (err instanceof ApiError) {
+          // Server-side capacity check kicked in (race after page loaded)
+          if (err.fieldErrors?.batchId === 'batch_full' || err.message === 'batch_full') {
+            setErrors((e) => ({
+              ...e,
+              batchId: 'รุ่นที่เลือกเต็มแล้ว — กรุณาเลือกรุ่นใหม่',
+            }));
+            setSubmitError(
+              'รุ่นนี้ที่นั่งเต็มแล้ว ระบบเพิ่งอัปเดตข้อมูล กรุณาเลือกรุ่นอื่น',
+            );
+            void availability.refresh();
+          } else if (err.fieldErrors) {
+            const mapped: Errors = {};
+            for (const k of Object.keys(err.fieldErrors) as (keyof RegistrationData)[]) {
+              mapped[k] = 'ข้อมูลไม่ถูกต้อง';
+            }
+            setErrors(mapped);
+          } else {
+            setSubmitError('ส่งใบสมัครไม่สำเร็จ กรุณาลองใหม่');
           }
-          setErrors(mapped);
         } else {
           console.error(err);
           setSubmitError('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ กรุณาลองใหม่');
@@ -256,12 +275,31 @@ const RegistrationForm = forwardRef<HTMLElement, Props>(
                   <option value="">
                     {selectedCourse ? '— กรุณาเลือกรอบเรียน —' : 'โปรดเลือกคอร์สก่อน'}
                   </option>
-                  {selectedCourse?.batches.map((b) => (
-                    <option key={b.id} value={b.id}>
-                      {b.label} • {b.date} • {b.time}
-                    </option>
-                  ))}
+                  {selectedCourse?.batches.map((b) => {
+                    const avail = availability.lookup(selectedCourse.id, b.id);
+                    const desc = describeAvailability(avail);
+                    const suffix = avail
+                      ? avail.isFull
+                        ? ' — ที่นั่งเต็ม'
+                        : ` — ${desc.label}`
+                      : '';
+                    return (
+                      <option
+                        key={b.id}
+                        value={b.id}
+                        disabled={!!avail?.isFull}
+                      >
+                        {b.label} • {b.date} • {b.time}
+                        {suffix}
+                      </option>
+                    );
+                  })}
                 </Select>
+                {selectedCourse && data.batchId && (
+                  <BatchSeatHint
+                    avail={availability.lookup(selectedCourse.id, data.batchId)}
+                  />
+                )}
               </FormField>
 
               <FormField label="ความคาดหวัง" full>
@@ -322,5 +360,23 @@ export default RegistrationForm;
 function Spinner() {
   return (
     <span className="h-4 w-4 inline-block rounded-full border-2 border-white/40 border-t-white animate-spin" />
+  );
+}
+
+function BatchSeatHint({ avail }: { avail: ReturnType<AvailabilityHelper['lookup']> }) {
+  const desc = describeAvailability(avail);
+  if (!avail || !desc.label) return null;
+  const tone =
+    desc.tone === 'red'
+      ? 'text-status-red'
+      : desc.tone === 'orange'
+        ? 'text-brand-orange'
+        : desc.tone === 'green'
+          ? 'text-status-green'
+          : 'text-fg-muted';
+  return (
+    <p className={`mt-2 text-xs font-medium ${tone}`}>
+      ↳ {desc.label} ({avail.count}/{avail.capacity})
+    </p>
   );
 }

@@ -12,6 +12,7 @@ import RegistrationForm, {
 import FAQ from '../components/FAQ';
 import Footer from '../components/Footer';
 import SuccessModal from '../components/SuccessModal';
+import { useBatchAvailability } from '../hooks/useBatchAvailability';
 
 export default function Landing() {
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
@@ -20,6 +21,8 @@ export default function Landing() {
   );
   const [showSuccess, setShowSuccess] = useState(false);
   const formRef = useRef<HTMLElement>(null);
+
+  const availability = useBatchAvailability();
 
   const handleSelectCourse = (courseId: string) => {
     setSelectedCourseId(courseId);
@@ -31,6 +34,8 @@ export default function Landing() {
   const handleSubmitSuccess = (data: RegistrationData) => {
     setSubmittedData(data);
     setShowSuccess(true);
+    // Refresh seat counts so the next user sees the new total
+    void availability.refresh();
   };
 
   return (
@@ -41,12 +46,16 @@ export default function Landing() {
         <Chapter01Problem />
         <Chapter02Shift />
         <ScrollStory />
-        <Courses onSelect={handleSelectCourse} />
+        <Courses
+          onSelect={handleSelectCourse}
+          availability={availability}
+        />
         <ExampleWork />
         <RegistrationForm
           ref={formRef}
           selectedCourseId={selectedCourseId}
           onSuccess={handleSubmitSuccess}
+          availability={availability}
         />
         <FAQ />
       </main>

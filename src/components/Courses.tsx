@@ -8,9 +8,24 @@ import Badge from './ui/Badge';
 import TiltCard from './ui/TiltCard';
 import MarqueeText from './ui/MarqueeText';
 import ChapterMarker from './landing/ChapterMarker';
+import {
+  describeAvailability,
+  type AvailabilityHelper,
+} from '../hooks/useBatchAvailability';
 
 type Props = {
   onSelect: (courseId: string) => void;
+  availability: AvailabilityHelper;
+};
+
+const AVAIL_TONE_CLASS: Record<
+  'red' | 'orange' | 'gray' | 'green',
+  string
+> = {
+  red: 'bg-status-red/10 text-status-red border-status-red/30',
+  orange: 'bg-brand-orange/10 text-brand-orange border-brand-orange/30',
+  gray: 'bg-line/40 text-fg-secondary border-line',
+  green: 'bg-status-green/10 text-status-green border-status-green/25',
 };
 
 const ACCENTS = [
@@ -26,7 +41,7 @@ const ACCENTS = [
   },
 ];
 
-export default function Courses({ onSelect }: Props) {
+export default function Courses({ onSelect, availability }: Props) {
   return (
     <>
       <MarqueeText
@@ -65,6 +80,7 @@ export default function Courses({ onSelect }: Props) {
                 course={c}
                 index={idx}
                 onSelect={() => onSelect(c.id)}
+                availability={availability}
               />
             ))}
           </div>
@@ -78,13 +94,16 @@ function CourseCard({
   course,
   index,
   onSelect,
+  availability,
 }: {
   course: Course;
   index: number;
   onSelect: () => void;
+  availability: AvailabilityHelper;
 }) {
   const accent = ACCENTS[index % ACCENTS.length];
   const lift = index === 0 ? 'lg:translate-y-0' : 'lg:translate-y-6';
+  const courseFull = availability.isCourseFull(course.id);
 
   return (
     <motion.div
@@ -161,20 +180,40 @@ function CourseCard({
                 Schedule
               </p>
               <div className="mt-4 grid sm:grid-cols-2 gap-3">
-                {course.batches.map((b) => (
-                  <div
-                    key={b.id}
-                    className="rounded-xl border border-line bg-elevated p-3.5 hover:border-line-strong transition-colors"
-                  >
-                    <p className="text-xs font-semibold text-fg-muted">
-                      {b.label}
-                    </p>
-                    <p className="mt-1 text-sm font-semibold text-ink">
-                      {b.date}
-                    </p>
-                    <p className="text-xs text-fg-secondary">{b.time}</p>
-                  </div>
-                ))}
+                {course.batches.map((b) => {
+                  const avail = availability.lookup(course.id, b.id);
+                  const tone = describeAvailability(avail);
+                  return (
+                    <div
+                      key={b.id}
+                      className={`rounded-xl border border-line bg-elevated p-3.5 transition-colors ${
+                        avail?.isFull ? 'opacity-70' : 'hover:border-line-strong'
+                      }`}
+                    >
+                      <p className="text-xs font-semibold text-fg-muted">
+                        {b.label}
+                      </p>
+                      <p
+                        className={`mt-1 text-sm font-semibold ${
+                          avail?.isFull
+                            ? 'text-fg-secondary line-through'
+                            : 'text-ink'
+                        }`}
+                      >
+                        {b.date}
+                      </p>
+                      <p className="text-xs text-fg-secondary">{b.time}</p>
+                      {tone.label && (
+                        <p
+                          className={`mt-2 inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] border rounded-full px-2 py-0.5 ${AVAIL_TONE_CLASS[tone.tone]}`}
+                        >
+                          <span className="h-1 w-1 rounded-full bg-current" />
+                          {tone.label}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -184,15 +223,18 @@ function CourseCard({
               fullWidth
               className="mt-7 group/btn"
               onClick={onSelect}
+              disabled={courseFull}
             >
-              เลือกคอร์สนี้
-              <motion.span
-                aria-hidden
-                className="inline-block"
-                whileHover={{ x: 2 }}
-              >
-                →
-              </motion.span>
+              {courseFull ? 'ที่นั่งเต็มทุกรุ่น' : 'เลือกคอร์สนี้'}
+              {!courseFull && (
+                <motion.span
+                  aria-hidden
+                  className="inline-block"
+                  whileHover={{ x: 2 }}
+                >
+                  →
+                </motion.span>
+              )}
             </Button>
           </div>
         </div>

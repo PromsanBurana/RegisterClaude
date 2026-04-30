@@ -1,5 +1,6 @@
 import type {
   AuthUser,
+  BatchAvailability,
   Registration,
   RegistrationInput,
   RegistrationStatus,
@@ -61,6 +62,12 @@ export async function me(): Promise<AuthUser | null> {
   if (!res.ok) throw new ApiError(`HTTP ${res.status}`, res.status);
   const body = (await res.json()) as { user: AuthUser };
   return body.user;
+}
+
+// ---------- Batch availability (public) ----------
+
+export async function getBatchAvailability(): Promise<BatchAvailability[]> {
+  return parse<BatchAvailability[]>(await fetch('/api/batches', credOpts));
 }
 
 // ---------- Registrations ----------
