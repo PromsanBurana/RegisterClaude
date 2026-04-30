@@ -37,6 +37,7 @@ const RegistrationForm = forwardRef<HTMLElement, Props>(
     const [data, setData] = useState<RegistrationData>(initialData);
     const [errors, setErrors] = useState<Errors>({});
     const [submitting, setSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState<string | null>(null);
 
     useEffect(() => {
       if (selectedCourseId && selectedCourseId !== data.courseId) {
@@ -76,13 +77,34 @@ const RegistrationForm = forwardRef<HTMLElement, Props>(
       e.preventDefault();
       if (!validate()) return;
       setSubmitting(true);
+      setSubmitError(null);
       try {
-        // Placeholder for future API integration
-        // await fetch('/api/register', { method: 'POST', body: JSON.stringify(data) })
-        await new Promise((r) => setTimeout(r, 700));
+        const res = await fetch('/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        const json = await res.json().catch(() => ({}));
+
+        if (!res.ok || !json.ok) {
+          if (json?.errors) {
+            const mapped: Errors = {};
+            for (const k of Object.keys(json.errors) as (keyof RegistrationData)[]) {
+              mapped[k] = 'ข้อมูลไม่ถูกต้อง';
+            }
+            setErrors(mapped);
+          } else {
+            setSubmitError('ส่งใบสมัครไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
+          }
+          return;
+        }
+
         onSuccess(data);
         setData(initialData);
         setErrors({});
+      } catch (err) {
+        console.error(err);
+        setSubmitError('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ กรุณาลองใหม่');
       } finally {
         setSubmitting(false);
       }
@@ -246,6 +268,16 @@ const RegistrationForm = forwardRef<HTMLElement, Props>(
                   />
                 </Field>
               </div>
+
+              {submitError && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-6 border-3 border-signal bg-signal/10 px-4 py-3 text-sm font-bold text-signal"
+                >
+                  ↳ {submitError}
+                </motion.div>
+              )}
 
               <div className="mt-10 pt-6 border-t-3 border-ink flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
                 <p className="text-xs font-mono uppercase tracking-widest opacity-60">

@@ -5,22 +5,64 @@
 1. **Vibe Coding (เขียนโค้ดด้วยความรู้สึก)** by Claude Code
 2. **ระบบงานอัตโนมัติ ด้วย Claude Cowork**
 
-ดีไซน์แนว Modern / Premium / Glassmorphism พร้อม animation จาก Framer Motion
-รองรับ Desktop / Tablet / Mobile แบบเต็มรูปแบบ ภาษาไทยทั้งหมด
+ดีไซน์แนว Modern editorial / brutalist (TBWA-inspired) โทนครีม-ดำ-แอ็กเซนต์เหลือง
+รองรับ Desktop / Tablet / Mobile ภาษาไทยทั้งหมด
 
 ---
 
-## เทคโนโลยีที่ใช้
+## เทคสแตก
 
-- **React 18** + **TypeScript**
-- **Vite** (build tool)
-- **Tailwind CSS** (styling)
-- **Framer Motion** (animation)
-- ฟอนต์ไทย: **Prompt** จาก Google Fonts
+**Frontend**
+- React 18 + TypeScript
+- Vite (dev / build)
+- Tailwind CSS
+- Framer Motion (animation)
+- ฟอนต์: Archivo Black + IBM Plex Sans Thai + JetBrains Mono
+
+**Backend**
+- Express + TypeScript (รันด้วย tsx)
+- PostgreSQL (pg)
+- ทำงานเป็น Service เดียวกับ frontend ใน production (Express serve `dist/`)
+
+**Deploy**
+- Railway (Nixpacks)
+- PostgreSQL plugin บน Railway
 
 ---
 
-## วิธีรันโปรเจกต์
+## โครงสร้างโปรเจกต์
+
+```
+.
+├── index.html
+├── vite.config.ts          # vite + proxy /api → :3000 (dev)
+├── railway.json            # Railway build/start config
+├── .env.example            # template env vars
+├── tsconfig.{app,server,node}.json
+├── server/
+│   ├── index.ts            # Express app + API endpoints
+│   └── db.ts               # PostgreSQL pool + schema init
+└── src/
+    ├── App.tsx
+    ├── main.tsx
+    ├── index.css
+    ├── data/courses.ts     # ข้อมูลคอร์ส (แก้ที่นี่)
+    └── components/
+        ├── Navbar.tsx
+        ├── Hero.tsx
+        ├── Marquee.tsx
+        ├── Courses.tsx
+        ├── ExampleWork.tsx
+        ├── WhyJoin.tsx
+        ├── RegistrationForm.tsx   # POST /api/register
+        ├── FAQ.tsx
+        ├── Footer.tsx
+        └── SuccessModal.tsx
+```
+
+---
+
+## วิธีรันโปรเจกต์ (local development)
 
 ### 1. ติดตั้ง dependencies
 
@@ -28,111 +70,161 @@
 npm install
 ```
 
-### 2. รัน dev server
+### 2. ตั้งค่า environment
+
+ก็อปปี้ `.env.example` เป็น `.env`:
+
+```bash
+cp .env.example .env
+```
+
+แก้ค่าใน `.env`:
+
+```env
+DATABASE_URL=postgresql://user:password@localhost:5432/claude_workshop
+ADMIN_TOKEN=your-long-random-token
+PORT=3000
+NODE_ENV=development
+```
+
+> ถ้ายังไม่มี Postgres ในเครื่อง ใช้ Docker ก็ได้:
+> `docker run -d -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=claude_workshop -p 5432:5432 postgres:16`
+
+### 3. รัน dev server (frontend + backend พร้อมกัน)
 
 ```bash
 npm run dev
 ```
 
-เปิดเว็บไซต์ได้ที่ http://localhost:5173
+- Frontend: http://localhost:5173
+- Backend:  http://localhost:3000
+- Vite proxy `/api/*` → backend อัตโนมัติ
 
-### 3. Build production
+> รันแยกกันได้ด้วย `npm run dev:web` กับ `npm run dev:api`
+
+### 4. Build production
 
 ```bash
 npm run build
-npm run preview
+npm start
 ```
+
+Server จะ serve `dist/` + API endpoint บนพอร์ตเดียวกัน
 
 ---
 
-## โครงสร้างโปรเจกต์
+## Deploy ขึ้น Railway
 
+### ขั้นที่ 1: สร้างโปรเจกต์และเพิ่ม PostgreSQL
+
+1. เข้า [railway.com](https://railway.com) → New Project → **Deploy from GitHub repo** → เลือก `RegisterClaude`
+2. ใน project นั้น คลิก **+ New** → **Database** → **PostgreSQL**
+3. Railway จะตั้งค่า `DATABASE_URL` ให้อัตโนมัติ
+
+### ขั้นที่ 2: เชื่อม env vars เข้า service
+
+ใน service ของ web app ไปที่ tab **Variables** ตั้งค่า:
+
+| Key | Value |
+|---|---|
+| `DATABASE_URL` | `${{Postgres.DATABASE_URL}}` (อ้างอิงจาก plugin) |
+| `ADMIN_TOKEN` | สุ่มยาว ๆ — ใช้ดู registrations |
+| `NODE_ENV` | `production` |
+
+> `PORT` Railway ใส่ให้เอง ไม่ต้องตั้ง
+
+### ขั้นที่ 3: Generate Domain
+
+ใน service tab **Settings** → **Networking** → **Generate Domain**
+จะได้ URL เช่น `claude-workshop-production.up.railway.app`
+
+ครั้งแรกที่ deploy server จะสร้างตาราง `registrations` ให้อัตโนมัติ
+
+---
+
+## API Endpoints
+
+### `POST /api/register`
+
+ส่งใบสมัคร — body JSON:
+
+```json
+{
+  "fullName": "สมชาย ใจดี",
+  "phone": "0812345678",
+  "email": "you@email.com",
+  "company": "Acme Co.",
+  "position": "Developer",
+  "courseId": "vibe-coding",
+  "batchId": "vibe-2",
+  "expectation": "..."
+}
 ```
-Register Course/
-├── index.html
-├── package.json
-├── vite.config.ts
-├── tailwind.config.js
-├── postcss.config.js
-├── tsconfig.json
-└── src/
-    ├── main.tsx              # entry point
-    ├── App.tsx               # ประกอบหน้าเว็บทั้งหมด
-    ├── index.css             # global styles + tailwind
-    ├── data/
-    │   └── courses.ts        # ข้อมูลคอร์ส (แก้ที่นี่ที่เดียว)
-    └── components/
-        ├── Navbar.tsx        # nav bar แบบ sticky + mobile menu
-        ├── Hero.tsx          # hero section พร้อม floating orbs
-        ├── Courses.tsx       # การ์ดคอร์ส 2 ใบ พร้อม hover effect
-        ├── ExampleWork.tsx   # ผลงานรุ่น 1 + browser mockup
-        ├── WhyJoin.tsx       # เหตุผล 6 ข้อ ในรูปแบบ icon cards
-        ├── RegistrationForm.tsx  # ฟอร์มลงทะเบียน + validation
-        ├── FAQ.tsx           # คำถามที่พบบ่อย แบบ accordion
-        ├── Footer.tsx        # footer
-        └── SuccessModal.tsx  # modal แจ้งสำเร็จ
+
+Response 201:
+
+```json
+{ "ok": true, "id": 1, "createdAt": "2025-05-01T..." }
 ```
+
+Response 400 (validation):
+
+```json
+{ "ok": false, "errors": { "email": "invalid" } }
+```
+
+### `GET /api/registrations` (admin)
+
+Header `x-admin-token: <ADMIN_TOKEN>` — ส่งกลับรายการสมัครล่าสุด 500 records
+
+### `GET /api/health`
+
+Health check ใช้กับ Railway/uptime monitor
+
+---
+
+## Database schema
+
+```sql
+CREATE TABLE registrations (
+  id          SERIAL PRIMARY KEY,
+  full_name   TEXT NOT NULL,
+  phone       TEXT NOT NULL,
+  email       TEXT NOT NULL,
+  company     TEXT,
+  position    TEXT,
+  course_id   TEXT NOT NULL,
+  batch_id    TEXT NOT NULL,
+  expectation TEXT,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+```
+
+Server เรียก `initSchema()` ตอนบูต — ใช้ `CREATE TABLE IF NOT EXISTS` ปลอดภัยกับการ deploy ซ้ำ
+
+---
+
+## ดู registrations ที่สมัครมา
+
+```bash
+curl https://your-app.up.railway.app/api/registrations \
+  -H "x-admin-token: YOUR_ADMIN_TOKEN"
+```
+
+หรือเข้า Railway PostgreSQL plugin → tab **Data** → ตาราง `registrations`
 
 ---
 
 ## การแก้ไขข้อมูลคอร์ส
 
-เปิดไฟล์ `src/data/courses.ts` เพื่อแก้ไข:
+แก้ที่ `src/data/courses.ts` ที่เดียว — ทั้งหน้าเว็บ + validation backend จะอัปเดตตาม
 
-- ชื่อคอร์ส, คำอธิบาย, highlights
-- รอบเรียน (เพิ่ม/ลบ batch)
-- กลุ่มเป้าหมาย
-- ลิงก์ตัวอย่างผลงาน
-
-ทุกส่วนของเว็บที่อ้างอิงข้อมูลคอร์สจะอัปเดตอัตโนมัติ
+ถ้าเพิ่มคอร์สใหม่ อย่าลืมเพิ่ม mapping ใน `server/index.ts` ตัวแปร `COURSE_BATCHES`
 
 ---
 
-## การต่อ Backend ภายหลัง
+## Tips
 
-เปิดไฟล์ `src/components/RegistrationForm.tsx` ฟังก์ชัน `handleSubmit`
-มีจุดให้ต่อ API ตามคอมเมนต์:
-
-```ts
-// Placeholder for future API integration
-// await fetch('/api/register', { method: 'POST', body: JSON.stringify(data) })
-```
-
-โครงสร้างข้อมูล `RegistrationData`:
-
-```ts
-type RegistrationData = {
-  fullName: string;
-  phone: string;
-  email: string;
-  company: string;
-  position: string;
-  courseId: string;     // 'vibe-coding' | 'cowork-automation'
-  batchId: string;      // 'vibe-2', 'vibe-3', 'cowork-1', 'cowork-2'
-  expectation: string;
-};
-```
-
----
-
-## Features
-
-- ✨ Glassmorphism + gradient background แบบหลายเลเยอร์
-- 🎯 Sticky navigation พร้อม mobile menu
-- 🌊 Smooth scroll ระหว่าง section
-- 🪄 Animation ตอน scroll เข้ามา (fade-in, slide-in)
-- 💎 Hover effects บน card / button
-- 🪂 Floating orbs ใน hero section
-- ✅ Form validation พร้อม error message
-- 🔄 Dropdown รุ่นเรียนเปลี่ยนตามคอร์สที่เลือก
-- 🎉 Success modal แบบ animated checkmark
-- 📱 Responsive ทุกขนาดหน้าจอ
-
----
-
-## Tips การปรับแต่ง
-
-- **เปลี่ยนสี theme**: แก้ใน `tailwind.config.js` ที่ `colors.brand`
-- **เปลี่ยนฟอนต์**: แก้ใน `index.html` (Google Fonts) และ `tailwind.config.js`
-- **เพิ่ม FAQ**: แก้ใน `src/components/FAQ.tsx` array `faqs`
-- **เปลี่ยน contact**: แก้ใน `src/components/Footer.tsx`
+- **เปลี่ยนสี theme**: `tailwind.config.js` → `colors.cream` / `colors.sun`
+- **เปลี่ยนฟอนต์**: `index.html` (Google Fonts) + `tailwind.config.js`
+- **CORS / Domain**: ถ้า frontend ขึ้น domain แยก ให้แก้ `cors()` ใน `server/index.ts` ระบุ origin
