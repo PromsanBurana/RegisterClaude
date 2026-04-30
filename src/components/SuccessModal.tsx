@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect } from 'react';
 import { findCourseById } from '../data/courses';
 import type { RegistrationData } from './RegistrationForm';
+import BoldButton from './ui/BoldButton';
 
 type Props = {
   open: boolean;
@@ -34,7 +35,7 @@ export default function SuccessModal({ open, data, onClose }: Props) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-ink/70 backdrop-blur-sm"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-ink/75 backdrop-blur-sm"
         >
           <motion.div
             onClick={(e) => e.stopPropagation()}
@@ -42,9 +43,9 @@ export default function SuccessModal({ open, data, onClose }: Props) {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 30, opacity: 0 }}
             transition={{ type: 'spring', damping: 22, stiffness: 280 }}
-            className="relative w-full max-w-lg bg-paper border-3 border-ink shadow-[12px_12px_0_0_#0a0a0a]"
+            className="relative w-full max-w-lg bg-sun border-3 border-ink shadow-offset-lg"
           >
-            <div className="flex items-center justify-between px-5 py-3 border-b-3 border-ink bg-ink text-cream">
+            <div className="flex items-center justify-between px-5 py-3 border-b-3 border-ink bg-ink text-sun">
               <span className="font-mono text-xs uppercase tracking-[0.25em]">
                 / Application Received
               </span>
@@ -62,7 +63,7 @@ export default function SuccessModal({ open, data, onClose }: Props) {
                 initial={{ scale: 0, rotate: -45 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.15, type: 'spring', damping: 12 }}
-                className="mx-auto h-24 w-24 bg-ink text-cream border-3 border-ink flex items-center justify-center"
+                className="mx-auto h-24 w-24 bg-ink text-sun border-3 border-ink flex items-center justify-center"
               >
                 <svg
                   className="h-12 w-12"
@@ -83,9 +84,7 @@ export default function SuccessModal({ open, data, onClose }: Props) {
               </motion.div>
 
               <h3 className="mt-6 font-display text-4xl md:text-5xl uppercase leading-none tracking-tight">
-                Application
-                <br />
-                Received.
+                Application<br />Received.
               </h3>
               <p className="mt-4 text-sm md:text-base font-medium leading-snug">
                 ขอบคุณที่สมัครเข้าคอร์สของเรา ทีมงานจะติดต่อกลับเพื่อยืนยันที่นั่ง
@@ -94,7 +93,7 @@ export default function SuccessModal({ open, data, onClose }: Props) {
               </p>
 
               {course && batch && (
-                <div className="mt-6 border-3 border-ink p-4 text-left bg-cream">
+                <div className="mt-6 border-3 border-ink p-4 text-left bg-paper">
                   <p className="font-mono text-[11px] uppercase tracking-[0.25em] opacity-60">
                     / Course
                   </p>
@@ -112,9 +111,9 @@ export default function SuccessModal({ open, data, onClose }: Props) {
                 </div>
               )}
 
-              <button onClick={onClose} className="mt-8 btn-ink w-full">
+              <BoldButton variant="ink" size="lg" fullWidth className="mt-8" onClick={onClose}>
                 เรียบร้อย ✦
-              </button>
+              </BoldButton>
             </div>
           </motion.div>
         </motion.div>

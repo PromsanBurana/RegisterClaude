@@ -1,37 +1,49 @@
 import { motion } from 'framer-motion';
-import Marquee from './Marquee';
-import { SectionHeader } from './Courses';
+import MarqueeText from './ui/MarqueeText';
+import SectionTitle from './ui/SectionTitle';
+import { BoldAnchor } from './ui/BoldButton';
 
 const EXAMPLE_URL = 'https://p-oil-project-production.up.railway.app/';
 
 export default function ExampleWork() {
   return (
     <>
-      <Marquee
-        text="30 MINUTES — IDEA TO SHIPPED"
-        className="bg-cream text-ink !border-ink"
+      <MarqueeText
+        items={[
+          '30 MINUTES',
+          'IDEA → SHIPPED',
+          'BATCH 01 RECEIPT',
+          'POWERED BY CLAUDE CODE',
+        ]}
+        tone="paper-on-ink"
         speed="slow"
       />
-      <section id="example" className="relative bg-ink text-cream border-b-3 border-ink">
+
+      <section id="example" className="relative bg-ink text-paper border-b-3 border-ink">
         <div className="container-narrow section-padding py-20 md:py-28">
-          <SectionHeader
+          <SectionTitle
             number="02"
-            eyebrow="Receipt"
-            title="Idea → Shipped. 30 Minutes."
+            eyebrow="The Receipt"
+            title={
+              <>
+                Idea → Shipped.<br />
+                <span className="text-sun">30 Minutes.</span>
+              </>
+            }
             subtitle="ผลงานจริงจากผู้เรียนรุ่น 1 ของ Vibe Coding ใช้ Claude Code สร้างเว็บไซต์เต็มรูปแบบและ deploy ใช้งานได้จริงภายในครึ่งชั่วโมง"
-            invert
+            tone="paper"
           />
 
-          <div className="mt-14 grid lg:grid-cols-12 gap-0 border-3 border-cream">
+          <div className="mt-14 grid lg:grid-cols-12 gap-0 border-3 border-paper">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="lg:col-span-5 p-6 md:p-10 border-b-3 lg:border-b-0 lg:border-r-3 border-cream"
+              className="lg:col-span-5 p-6 md:p-10 border-b-3 lg:border-b-0 lg:border-r-3 border-paper"
             >
-              <p className="font-mono text-xs uppercase tracking-[0.25em] mb-6">
-                / Live Demo / Batch 01
+              <p className="font-mono text-xs uppercase tracking-[0.25em] mb-6 opacity-70">
+                / Live Demo · Batch 01
               </p>
 
               <div className="space-y-6">
@@ -41,23 +53,24 @@ export default function ExampleWork() {
               </div>
 
               <div className="mt-10 space-y-3">
-                <a
+                <BoldAnchor
                   href={EXAMPLE_URL}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex w-full items-center justify-center gap-2 px-7 py-4 bg-cream text-ink border-3 border-cream font-semibold uppercase hover:bg-sun hover:border-sun transition-colors group"
+                  variant="sun"
+                  size="lg"
+                  fullWidth
                 >
-                  ดูตัวอย่างผลงาน
-                  <span className="transition-transform group-hover:translate-x-1">
-                    ↗
-                  </span>
-                </a>
-                <a
+                  ดูตัวอย่างผลงาน <span aria-hidden>↗</span>
+                </BoldAnchor>
+                <BoldAnchor
                   href="#register"
-                  className="inline-flex w-full items-center justify-center gap-2 px-7 py-4 border-3 border-cream text-cream font-semibold uppercase hover:bg-cream hover:text-ink transition-colors"
+                  variant="outline-sun"
+                  size="lg"
+                  fullWidth
                 >
                   สมัครคอร์สนี้
-                </a>
+                </BoldAnchor>
               </div>
             </motion.div>
 
@@ -66,7 +79,7 @@ export default function ExampleWork() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.15 }}
-              className="lg:col-span-7 relative bg-cream text-ink"
+              className="lg:col-span-7 relative bg-sun text-ink"
             >
               <BrowserMockup url={EXAMPLE_URL} />
             </motion.div>
@@ -79,10 +92,10 @@ export default function ExampleWork() {
 
 function Stat({ n, u, l }: { n: string; u: string; l: string }) {
   return (
-    <div className="border-b-3 border-sun/40 pb-5 last:border-b-0 last:pb-0">
-      <p className="number-display text-7xl md:text-8xl">
+    <div className="border-b-3 border-paper/30 pb-5 last:border-b-0 last:pb-0">
+      <p className="font-display leading-none text-display-stat tracking-tight">
         {n}
-        <span className="text-2xl md:text-3xl ml-1 font-mono align-top mt-2 inline-block">
+        <span className="text-2xl md:text-3xl ml-1 font-mono align-top mt-2 inline-block opacity-80">
           {u}
         </span>
       </p>
@@ -104,15 +117,13 @@ function BrowserMockup({ url }: { url: string }) {
           {url.replace('https://', '')}
         </div>
       </div>
-      <div className="relative flex-1 bg-cream min-h-[420px] grid-lines flex items-center justify-center p-8">
+      <div className="relative flex-1 bg-sun min-h-[420px] grid-lines flex items-center justify-center p-8">
         <div className="text-center max-w-sm">
           <p className="font-mono text-xs uppercase tracking-[0.3em] opacity-60">
             / Live Project
           </p>
           <p className="mt-3 font-display text-5xl md:text-6xl uppercase leading-none">
-            ผลงาน
-            <br />
-            รุ่น 01
+            ผลงาน<br />รุ่น 01
           </p>
           <p className="mt-4 text-sm font-medium leading-snug">
             เว็บใช้งานจริงที่สร้างขึ้นใน 30 นาที โดยผู้เรียนของรุ่นที่ 1
@@ -134,7 +145,7 @@ function BrowserMockup({ url }: { url: string }) {
         >
           ✦
         </motion.div>
-        <span className="absolute bottom-6 left-6 font-mono text-xs uppercase tracking-widest opacity-50">
+        <span className="absolute bottom-6 left-6 font-mono text-xs uppercase tracking-widest opacity-60">
           / 30 minutes
         </span>
       </div>

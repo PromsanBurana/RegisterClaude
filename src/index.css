@@ -8,12 +8,12 @@
   }
 
   body {
-    @apply bg-cream text-ink font-sans antialiased;
+    @apply bg-paper text-ink font-sans antialiased;
     font-feature-settings: 'ss01', 'cv11';
   }
 
   ::selection {
-    @apply bg-ink text-sun;
+    @apply bg-sun text-ink;
   }
 
   /* Scrollbar */
@@ -22,98 +22,81 @@
     height: 12px;
   }
   ::-webkit-scrollbar-track {
-    @apply bg-cream;
-    border-left: 1px solid #0a0a0a;
+    @apply bg-bone;
+    border-left: 1px solid #050505;
   }
   ::-webkit-scrollbar-thumb {
     @apply bg-ink;
-    border: 2px solid #f4efe3;
+    border: 2px solid #fafaf7;
   }
 
-  h1, h2, h3, h4 {
+  h1,
+  h2,
+  h3,
+  h4 {
     @apply font-display tracking-tight;
+  }
+
+  /* Native dropdown options keep theme on dark backgrounds */
+  select option {
+    @apply bg-paper text-ink;
   }
 }
 
 @layer components {
-  .btn-ink {
-    @apply inline-flex items-center justify-center gap-2 px-7 py-4 bg-ink text-cream font-semibold tracking-tight uppercase border-3 border-ink transition-all duration-200;
-  }
-  .btn-ink:hover {
-    @apply bg-sun text-ink;
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0 0 #0a0a0a;
-  }
-
-  .btn-outline {
-    @apply inline-flex items-center justify-center gap-2 px-7 py-4 bg-transparent text-ink font-semibold tracking-tight uppercase border-3 border-ink transition-all duration-200;
-  }
-  .btn-outline:hover {
-    @apply bg-ink text-cream;
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0 0 #0a0a0a;
-  }
-
-  .btn-sun {
-    @apply inline-flex items-center justify-center gap-2 px-7 py-4 bg-sun text-ink font-semibold tracking-tight uppercase border-3 border-ink transition-all duration-200;
-  }
-  .btn-sun:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0 0 #0a0a0a;
-  }
-
-  .input-bw {
-    @apply w-full px-4 py-3.5 bg-paper border-b-3 border-ink text-ink placeholder:text-ink/40 font-medium focus:outline-none focus:bg-paper/60 transition-colors;
-  }
-
-  .input-block {
-    @apply w-full px-4 py-3.5 bg-bone border-3 border-ink text-ink placeholder:text-ink/40 font-medium focus:outline-none focus:bg-sun transition-colors;
-  }
-
-  .label-bw {
-    @apply block text-xs font-bold text-ink uppercase tracking-[0.2em] mb-2;
+  .container-narrow {
+    @apply max-w-[1440px] mx-auto;
   }
 
   .section-padding {
     @apply px-5 sm:px-8 lg:px-12;
   }
 
-  .container-narrow {
-    @apply max-w-[1440px] mx-auto;
+  .input-bw {
+    @apply w-full px-4 py-3.5 bg-paper border-3 border-ink text-ink placeholder:text-ink/40 font-medium focus:outline-none focus:bg-sun/30 transition-colors;
   }
 
-  .tag {
+  .label-bw {
+    @apply block text-[10px] font-bold text-ink uppercase tracking-[0.25em] mb-2;
+  }
+
+  .tag-pill {
     @apply inline-flex items-center gap-2 px-3 py-1 border-2 border-ink text-[11px] font-bold uppercase tracking-[0.18em];
-  }
-
-  .number-display {
-    @apply font-display leading-none tracking-tight;
   }
 }
 
 @layer utilities {
   .text-stroke {
-    -webkit-text-stroke: 2px #0a0a0a;
+    -webkit-text-stroke: 2px currentColor;
     color: transparent;
   }
 
   .text-stroke-thin {
-    -webkit-text-stroke: 1px #0a0a0a;
+    -webkit-text-stroke: 1px currentColor;
     color: transparent;
   }
 
   .grid-lines {
-    background-image:
-      linear-gradient(to right, rgba(10, 10, 10, 0.08) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(10, 10, 10, 0.08) 1px, transparent 1px);
+    background-image: linear-gradient(
+        to right,
+        rgba(5, 5, 5, 0.06) 1px,
+        transparent 1px
+      ),
+      linear-gradient(to bottom, rgba(5, 5, 5, 0.06) 1px, transparent 1px);
+    background-size: 80px 80px;
+  }
+
+  .grid-lines-dark {
+    background-image: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0.06) 1px,
+        transparent 1px
+      ),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
     background-size: 80px 80px;
   }
 
   .text-balance {
     text-wrap: balance;
-  }
-
-  .border-ink-3 {
-    border: 3px solid #0a0a0a;
   }
 }

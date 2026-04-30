@@ -4,32 +4,55 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"IBM Plex Sans Thai"', 'Archivo', 'system-ui', 'sans-serif'],
+        sans: ['"IBM Plex Sans Thai"', 'Inter', 'Archivo', 'system-ui', 'sans-serif'],
         display: ['"Archivo Black"', '"IBM Plex Sans Thai"', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
       },
       colors: {
-        ink: '#0A0A0A',
-        graphite: '#1F1F1F',
-        smoke: '#6E6E6E',
-        cream: '#F4EFE3',
-        bone: '#F8F5EC',
+        ink: '#050505',
+        graphite: '#1A1A1A',
+        smoke: '#6B6B6B',
         paper: '#FFFFFF',
-        sun: {
-          DEFAULT: '#FFD83D',
-          dark: '#F5C300',
+        cream: '#FAFAF7',
+        bone: '#F2F2EE',
+        gray: {
+          soft: '#EAEAEA',
+          mid: '#9A9A9A',
         },
-        signal: '#FF4D14',
-        electric: '#1F3DFF',
+        sun: {
+          DEFAULT: '#FFD400',
+          dark: '#E5BE00',
+          deep: '#C9A800',
+        },
+        signal: '#FF1F1F',
+        electric: '#0052FF',
       },
       fontSize: {
-        'display-1': ['clamp(3rem, 11vw, 11rem)', { lineHeight: '0.9', letterSpacing: '-0.04em' }],
-        'display-2': ['clamp(2.5rem, 7vw, 6.5rem)', { lineHeight: '0.92', letterSpacing: '-0.03em' }],
-        'display-3': ['clamp(2rem, 5vw, 4.5rem)', { lineHeight: '0.95', letterSpacing: '-0.02em' }],
+        'display-mega': [
+          'clamp(3.5rem, 14vw, 14rem)',
+          { lineHeight: '0.85', letterSpacing: '-0.045em' },
+        ],
+        'display-1': [
+          'clamp(3rem, 11.5vw, 11.5rem)',
+          { lineHeight: '0.88', letterSpacing: '-0.04em' },
+        ],
+        'display-2': [
+          'clamp(2.5rem, 8.5vw, 8.5rem)',
+          { lineHeight: '0.9', letterSpacing: '-0.03em' },
+        ],
+        'display-3': [
+          'clamp(2rem, 5.5vw, 5rem)',
+          { lineHeight: '0.95', letterSpacing: '-0.02em' },
+        ],
+        'display-stat': [
+          'clamp(3.5rem, 11vw, 9rem)',
+          { lineHeight: '0.85', letterSpacing: '-0.04em' },
+        ],
       },
       animation: {
         marquee: 'marquee 28s linear infinite',
         'marquee-slow': 'marquee 50s linear infinite',
+        'marquee-fast': 'marquee 18s linear infinite',
         'spin-slow': 'spin 14s linear infinite',
         'spin-slower': 'spin 30s linear infinite',
         blink: 'blink 1.2s step-end infinite',
@@ -46,6 +69,12 @@ export default {
       },
       borderWidth: {
         3: '3px',
+        5: '5px',
+      },
+      boxShadow: {
+        offset: '6px 6px 0 0 #050505',
+        'offset-lg': '10px 10px 0 0 #050505',
+        'offset-sun': '6px 6px 0 0 #FFD400',
       },
     },
   },

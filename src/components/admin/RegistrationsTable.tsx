@@ -37,7 +37,7 @@ export default function RegistrationsTable({
     <div className="border-3 border-ink bg-paper overflow-x-auto">
       <table className="w-full text-sm border-collapse min-w-[1100px]">
         <thead>
-          <tr className="bg-ink text-cream">
+          <tr className="bg-ink text-paper">
             {[
               '#',
               'วันที่ลงทะเบียน',
@@ -53,7 +53,7 @@ export default function RegistrationsTable({
             ].map((h) => (
               <th
                 key={h}
-                className="px-3 py-3 text-left font-mono text-[10px] uppercase tracking-[0.2em] font-bold border-r border-cream/20 last:border-r-0 whitespace-nowrap"
+                className="px-3 py-3 text-left font-mono text-[10px] uppercase tracking-[0.2em] font-bold border-r border-paper/20 last:border-r-0 whitespace-nowrap"
               >
                 {h}
               </th>
@@ -66,7 +66,7 @@ export default function RegistrationsTable({
             return (
               <tr
                 key={r.id}
-                className={`border-t-2 border-ink/20 hover:bg-cream transition-colors ${
+                className={`border-t-2 border-ink/15 hover:bg-sun/30 transition-colors ${
                   pending ? 'opacity-50' : ''
                 }`}
               >
@@ -99,7 +99,7 @@ export default function RegistrationsTable({
                     <button
                       onClick={() => onView(r)}
                       title="ดูรายละเอียด"
-                      className="px-2 py-1 border-2 border-ink hover:bg-ink hover:text-cream transition-colors text-xs font-bold"
+                      className="px-2 py-1 border-2 border-ink hover:bg-ink hover:text-sun transition-colors text-xs font-bold"
                     >
                       View
                     </button>
@@ -121,7 +121,7 @@ export default function RegistrationsTable({
                       onClick={() => onDelete(r.id)}
                       disabled={pending}
                       title="ลบ"
-                      className="px-2 py-1 border-2 border-signal text-signal hover:bg-signal hover:text-cream transition-colors text-xs font-bold disabled:opacity-50"
+                      className="px-2 py-1 border-2 border-signal text-signal hover:bg-signal hover:text-paper transition-colors text-xs font-bold disabled:opacity-50"
                     >
                       Delete
                     </button>

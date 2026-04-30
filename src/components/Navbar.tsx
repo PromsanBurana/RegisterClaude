@@ -28,27 +28,27 @@ export default function Navbar() {
       setTime(`${hh}:${mm} BKK`);
     };
     tick();
-    const id = setInterval(tick, 30000);
+    const id = setInterval(tick, 30_000);
     return () => clearInterval(id);
   }, []);
 
   return (
     <header
-      className={`fixed top-0 inset-x-0 z-50 bg-cream/95 backdrop-blur-md border-b-3 border-ink transition-all ${
+      className={`fixed top-0 inset-x-0 z-50 bg-ink text-paper border-b-3 border-ink transition-all ${
         scrolled ? 'py-2' : 'py-3'
       }`}
     >
       <div className="container-narrow section-padding flex items-center justify-between gap-4">
         <a href="#top" className="flex items-center gap-3 group">
-          <span className="flex h-10 w-10 items-center justify-center bg-ink text-cream font-display text-2xl">
+          <span className="flex h-10 w-10 items-center justify-center bg-sun text-ink font-display text-2xl">
             ✦
           </span>
           <div className="leading-none">
             <p className="font-display text-base md:text-lg uppercase tracking-tight">
-              Claude/Workshop
+              BOLD/DISRUPTION
             </p>
-            <p className="text-[10px] font-mono uppercase tracking-[0.2em] mt-1 text-ink/60">
-              EST. 2025 — BKK
+            <p className="text-[10px] font-mono uppercase tracking-[0.2em] mt-1 text-paper/55">
+              WORKSHOP — BKK 2025
             </p>
           </div>
         </a>
@@ -58,7 +58,7 @@ export default function Navbar() {
             <a
               key={l.href}
               href={l.href}
-              className="px-4 py-2 text-sm font-bold uppercase tracking-wide hover:bg-ink hover:text-cream transition-colors"
+              className="px-4 py-2 text-sm font-bold uppercase tracking-wide hover:bg-sun hover:text-ink transition-colors"
             >
               {l.label}
             </a>
@@ -66,10 +66,13 @@ export default function Navbar() {
         </nav>
 
         <div className="hidden md:flex items-center gap-4">
-          <span className="font-mono text-xs uppercase tracking-widest">
+          <span className="font-mono text-xs uppercase tracking-widest text-paper/70">
             {time}
           </span>
-          <a href="#register" className="btn-ink !py-2.5 !px-5 text-xs">
+          <a
+            href="#register"
+            className="inline-flex items-center gap-2 bg-sun text-ink border-3 border-sun px-5 py-2.5 text-xs font-bold uppercase tracking-tight hover:bg-paper hover:border-paper transition-colors"
+          >
             Apply →
           </a>
         </div>
@@ -77,21 +80,21 @@ export default function Navbar() {
         <button
           aria-label="menu"
           onClick={() => setOpen((s) => !s)}
-          className="md:hidden h-10 w-10 bg-ink text-cream flex items-center justify-center"
+          className="md:hidden h-10 w-10 bg-sun text-ink flex items-center justify-center"
         >
           <div className="space-y-1">
             <span
-              className={`block h-0.5 w-5 bg-cream transition-transform ${
+              className={`block h-0.5 w-5 bg-ink transition-transform ${
                 open ? 'translate-y-1.5 rotate-45' : ''
               }`}
             />
             <span
-              className={`block h-0.5 w-5 bg-cream transition-opacity ${
+              className={`block h-0.5 w-5 bg-ink transition-opacity ${
                 open ? 'opacity-0' : ''
               }`}
             />
             <span
-              className={`block h-0.5 w-5 bg-cream transition-transform ${
+              className={`block h-0.5 w-5 bg-ink transition-transform ${
                 open ? '-translate-y-1.5 -rotate-45' : ''
               }`}
             />
@@ -105,7 +108,7 @@ export default function Navbar() {
             initial={{ height: 0 }}
             animate={{ height: 'auto' }}
             exit={{ height: 0 }}
-            className="md:hidden overflow-hidden border-t-3 border-ink"
+            className="md:hidden overflow-hidden border-t-3 border-paper/20"
           >
             <div className="container-narrow section-padding py-4 space-y-1">
               {links.map((l) => (
@@ -113,7 +116,7 @@ export default function Navbar() {
                   key={l.href}
                   href={l.href}
                   onClick={() => setOpen(false)}
-                  className="block py-3 px-3 font-bold uppercase tracking-wide border-b-2 border-ink/20 hover:bg-ink hover:text-cream"
+                  className="block py-3 px-3 font-bold uppercase tracking-wide border-b-2 border-paper/20 hover:bg-sun hover:text-ink"
                 >
                   {l.label}
                 </a>
@@ -121,7 +124,7 @@ export default function Navbar() {
               <a
                 href="#register"
                 onClick={() => setOpen(false)}
-                className="btn-ink w-full mt-3"
+                className="block w-full text-center mt-3 bg-sun text-ink border-3 border-sun px-5 py-3 font-bold uppercase tracking-tight"
               >
                 Apply →
               </a>

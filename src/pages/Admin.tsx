@@ -135,7 +135,7 @@ export default function Admin() {
   ];
 
   return (
-    <div className="min-h-screen bg-cream text-ink">
+    <div className="min-h-screen bg-bone text-ink">
       <AdminHeader
         total={data.length}
         loading={loading}

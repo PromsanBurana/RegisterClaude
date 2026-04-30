@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { SectionHeader } from './Courses';
+import SectionTitle from './ui/SectionTitle';
 
 const faqs = [
   {
@@ -33,12 +33,12 @@ export default function FAQ() {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
 
   return (
-    <section id="faq" className="relative bg-cream border-b-3 border-ink">
+    <section id="faq" className="relative bg-paper border-b-3 border-ink">
       <div className="container-narrow section-padding py-20 md:py-28">
-        <SectionHeader
+        <SectionTitle
           number="05"
           eyebrow="FAQ"
-          title="Got Questions? Same."
+          title={<>Got Questions?<br />Same.</>}
         />
 
         <div className="mt-14 border-t-3 border-ink">
@@ -52,8 +52,8 @@ export default function FAQ() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.04 }}
                 className={`border-b-3 border-ink ${
-                  isOpen ? 'bg-paper' : 'bg-transparent'
-                }`}
+                  isOpen ? 'bg-sun' : 'bg-paper hover:bg-cream'
+                } transition-colors`}
               >
                 <button
                   onClick={() => setOpenIdx(isOpen ? null : i)}

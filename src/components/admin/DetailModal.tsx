@@ -39,7 +39,7 @@ export default function DetailModal({ registration, onClose }: Props) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-ink/70 backdrop-blur-sm"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-ink/75 backdrop-blur-sm"
         >
           <motion.div
             onClick={(e) => e.stopPropagation()}
@@ -47,9 +47,9 @@ export default function DetailModal({ registration, onClose }: Props) {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 20, opacity: 0 }}
             transition={{ type: 'spring', damping: 24, stiffness: 280 }}
-            className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-paper border-3 border-ink shadow-[12px_12px_0_0_#0a0a0a]"
+            className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-paper border-3 border-ink shadow-offset-lg"
           >
-            <div className="sticky top-0 flex items-center justify-between px-5 py-3 border-b-3 border-ink bg-ink text-cream z-10">
+            <div className="sticky top-0 flex items-center justify-between px-5 py-3 border-b-3 border-ink bg-ink text-sun z-10">
               <span className="font-mono text-xs uppercase tracking-[0.25em]">
                 / Registration Detail
               </span>
@@ -83,7 +83,10 @@ export default function DetailModal({ registration, onClose }: Props) {
               </div>
 
               <div className="grid sm:grid-cols-2 gap-4">
-                <Field label="บริษัท / หน่วยงาน" value={registration.company || '—'} />
+                <Field
+                  label="บริษัท / หน่วยงาน"
+                  value={registration.company || '—'}
+                />
                 <Field label="ตำแหน่ง" value={registration.position || '—'} />
               </div>
 

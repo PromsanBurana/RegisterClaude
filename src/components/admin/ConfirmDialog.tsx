@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect } from 'react';
+import BoldButton from '../ui/BoldButton';
 
 type Props = {
   open: boolean;
@@ -37,16 +38,16 @@ export default function ConfirmDialog({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onCancel}
-          className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-ink/70 backdrop-blur-sm"
+          className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-ink/75 backdrop-blur-sm"
         >
           <motion.div
             onClick={(e) => e.stopPropagation()}
             initial={{ y: 12, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 12, opacity: 0 }}
-            className="w-full max-w-md bg-paper border-3 border-ink shadow-[10px_10px_0_0_#0a0a0a]"
+            className="w-full max-w-md bg-paper border-3 border-ink shadow-offset-lg"
           >
-            <div className="px-5 py-3 border-b-3 border-ink bg-ink text-cream font-mono text-xs uppercase tracking-[0.25em]">
+            <div className="px-5 py-3 border-b-3 border-ink bg-ink text-sun font-mono text-xs uppercase tracking-[0.25em]">
               / {destructive ? 'Confirm Delete' : 'Confirm'}
             </div>
             <div className="p-6">
@@ -57,22 +58,16 @@ export default function ConfirmDialog({
                 {message}
               </p>
               <div className="mt-6 flex gap-3 justify-end">
-                <button
-                  onClick={onCancel}
-                  className="px-5 py-2.5 border-3 border-ink font-bold uppercase text-sm tracking-tight hover:bg-ink hover:text-cream transition-colors"
-                >
+                <BoldButton variant="outline-ink" size="md" onClick={onCancel}>
                   ยกเลิก
-                </button>
-                <button
+                </BoldButton>
+                <BoldButton
+                  variant={destructive ? 'signal' : 'ink'}
+                  size="md"
                   onClick={onConfirm}
-                  className={`px-5 py-2.5 border-3 font-bold uppercase text-sm tracking-tight transition-colors ${
-                    destructive
-                      ? 'bg-signal text-cream border-signal hover:bg-ink hover:border-ink'
-                      : 'bg-ink text-cream border-ink hover:bg-sun hover:text-ink hover:border-ink'
-                  }`}
                 >
                   {confirmLabel}
-                </button>
+                </BoldButton>
               </div>
             </div>
           </motion.div>

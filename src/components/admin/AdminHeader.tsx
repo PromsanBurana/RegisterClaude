@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../hooks/useAuth';
+import BoldButton from '../ui/BoldButton';
 
 type Props = {
   total: number;
@@ -23,66 +24,65 @@ export default function AdminHeader({
   };
 
   return (
-    <header className="border-b-3 border-ink bg-ink text-cream">
-      <div className="container-narrow section-padding py-6">
+    <header className="relative bg-sun text-ink border-b-3 border-ink overflow-hidden">
+      <div className="absolute inset-0 grid-lines pointer-events-none" />
+      <div className="relative container-narrow section-padding py-8 md:py-10">
         <div className="flex flex-wrap items-start gap-6 justify-between">
           <div className="flex-1 min-w-[260px]">
-            <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex items-center gap-3 flex-wrap text-ink">
               <Link
                 to="/"
-                className="font-mono text-[11px] uppercase tracking-[0.25em] text-cream/60 hover:text-cream transition-colors"
+                className="font-mono text-[11px] uppercase tracking-[0.25em] hover:underline"
               >
                 ← Back to site
               </Link>
               {user && (
-                <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-cream/60">
+                <span className="font-mono text-[11px] uppercase tracking-[0.25em] opacity-70">
                   · signed in as{' '}
-                  <span className="text-cream font-bold">{user.username}</span>{' '}
-                  <span className="text-sun">[{user.role}]</span>
+                  <span className="text-ink font-bold">{user.username}</span>{' '}
+                  <span className="bg-ink text-sun px-1.5 py-0.5 ml-1">
+                    {user.role}
+                  </span>
                 </span>
               )}
             </div>
             <motion.h1
-              initial={{ opacity: 0, y: 8 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="mt-3 font-display text-4xl md:text-6xl uppercase tracking-tight leading-[0.95]"
+              className="mt-3 font-display text-display-2 uppercase tracking-tight leading-[0.9]"
             >
-              Admin Dashboard
+              Admin<br />
+              <span className="text-stroke">Control</span> /
             </motion.h1>
-            <p className="mt-3 text-sm md:text-base text-cream/65 max-w-xl">
+            <p className="mt-3 text-sm md:text-base font-medium max-w-xl">
               ข้อมูลผู้ลงทะเบียนคอร์ส — อ่านสดจาก Railway Volume
             </p>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
-            <span className="hidden sm:inline-flex tag border-cream text-cream">
+            <span className="hidden sm:inline-flex tag-pill bg-ink text-sun border-ink">
               <span className="font-mono">/ {total} records</span>
             </span>
-            <button
+            <BoldButton
+              variant="outline-ink"
+              size="md"
               onClick={onRefresh}
               disabled={loading}
-              className="inline-flex items-center gap-2 px-5 py-3 border-3 border-cream text-cream font-bold uppercase text-sm tracking-tight hover:bg-cream hover:text-ink transition-colors disabled:opacity-50 disabled:cursor-wait"
             >
               {loading ? (
-                <span className="h-3.5 w-3.5 border-2 border-cream/40 border-t-cream rounded-full animate-spin" />
+                <span className="h-3.5 w-3.5 border-2 border-ink/40 border-t-ink rounded-full animate-spin" />
               ) : (
-                <span>↻</span>
+                <span aria-hidden>↻</span>
               )}
               Refresh
-            </button>
-            <button
-              onClick={onExport}
-              className="inline-flex items-center gap-2 px-5 py-3 bg-cream text-ink border-3 border-cream font-bold uppercase text-sm tracking-tight hover:bg-sun hover:border-sun transition-colors"
-            >
-              ↓ Export CSV
-            </button>
-            <button
-              onClick={handleLogout}
-              className="inline-flex items-center gap-2 px-5 py-3 border-3 border-signal text-signal font-bold uppercase text-sm tracking-tight hover:bg-signal hover:text-cream transition-colors"
-            >
-              ↩ Logout
-            </button>
+            </BoldButton>
+            <BoldButton variant="ink" size="md" onClick={onExport}>
+              <span aria-hidden>↓</span> Export CSV
+            </BoldButton>
+            <BoldButton variant="signal" size="md" onClick={handleLogout}>
+              <span aria-hidden>↩</span> Logout
+            </BoldButton>
           </div>
         </div>
       </div>

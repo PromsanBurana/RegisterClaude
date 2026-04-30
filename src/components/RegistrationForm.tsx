@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState, forwardRef } from 'react';
 import { motion } from 'framer-motion';
 import { courses, findCourseById } from '../data/courses';
-import { SectionHeader } from './Courses';
 import { createRegistration, ApiError } from '../api';
+import SectionTitle from './ui/SectionTitle';
+import BoldButton from './ui/BoldButton';
 
 export type RegistrationData = {
   fullName: string;
@@ -107,10 +108,10 @@ const RegistrationForm = forwardRef<HTMLElement, Props>(
         className="relative bg-paper border-b-3 border-ink"
       >
         <div className="container-narrow section-padding py-20 md:py-28">
-          <SectionHeader
+          <SectionTitle
             number="04"
             eyebrow="Apply Now"
-            title="Get In. Get Building."
+            title={<>Get In.<br />Get Building.</>}
             subtitle="กรอกแบบฟอร์มเพื่อสมัคร ทีมงานจะติดต่อกลับเพื่อยืนยันที่นั่งภายใน 24 ชม."
           />
 
@@ -122,17 +123,15 @@ const RegistrationForm = forwardRef<HTMLElement, Props>(
             transition={{ duration: 0.6 }}
             className="mt-12 grid lg:grid-cols-12 gap-0 border-3 border-ink"
           >
-            <div className="lg:col-span-4 bg-ink text-cream p-6 md:p-10">
+            {/* Yellow side panel */}
+            <div className="lg:col-span-4 bg-sun text-ink p-6 md:p-10 flex flex-col">
               <p className="font-mono text-xs uppercase tracking-[0.25em] mb-6">
                 / Form 04
               </p>
               <h3 className="font-display text-4xl md:text-5xl uppercase leading-[0.9] tracking-tight">
-                Apply.
-                <br />
-                We Reply.
-                <br />
-                You Build.
+                Apply.<br />We Reply.<br />You Build.
               </h3>
+
               <div className="mt-10 space-y-4 text-sm font-medium">
                 <div className="flex items-start gap-3">
                   <span className="font-display text-xl">→</span>
@@ -148,18 +147,21 @@ const RegistrationForm = forwardRef<HTMLElement, Props>(
                 </div>
               </div>
 
-              <div className="mt-10 pt-6 border-t-3 border-cream">
-                <p className="font-mono text-[10px] uppercase tracking-[0.3em] opacity-60">
-                  / Status
-                </p>
-                <p className="mt-2 flex items-center gap-2 font-bold uppercase">
-                  <span className="h-2 w-2 rounded-full bg-sun animate-blink" />
-                  Now Enrolling
-                </p>
+              <div className="mt-auto pt-8">
+                <div className="border-t-3 border-ink pt-5">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.3em] opacity-70">
+                    / Status
+                  </p>
+                  <p className="mt-2 flex items-center gap-2 font-bold uppercase">
+                    <span className="h-2 w-2 rounded-full bg-ink animate-blink" />
+                    Now Enrolling
+                  </p>
+                </div>
               </div>
             </div>
 
-            <div className="lg:col-span-8 bg-cream p-6 md:p-10">
+            {/* White form area */}
+            <div className="lg:col-span-8 bg-paper p-6 md:p-10">
               <div className="grid sm:grid-cols-2 gap-x-6 gap-y-7">
                 <Field label="ชื่อ-นามสกุล" required error={errors.fullName} full>
                   <input
@@ -273,25 +275,25 @@ const RegistrationForm = forwardRef<HTMLElement, Props>(
                 <p className="text-xs font-mono uppercase tracking-widest opacity-60">
                   / กดส่งคือยืนยันให้ติดต่อกลับ
                 </p>
-                <button
+                <BoldButton
                   type="submit"
+                  variant="ink"
+                  size="lg"
                   disabled={submitting}
-                  className="btn-ink group disabled:opacity-60 disabled:cursor-wait"
+                  className="group"
                 >
                   {submitting ? (
                     <>
-                      <span className="h-4 w-4 border-2 border-sun/40 border-t-sun animate-spin" />
+                      <span className="h-4 w-4 border-2 border-paper/40 border-t-paper rounded-full animate-spin" />
                       กำลังส่ง...
                     </>
                   ) : (
                     <>
                       ส่งใบสมัคร
-                      <span className="transition-transform group-hover:translate-x-1">
-                        →
-                      </span>
+                      <span className="transition-transform group-hover:translate-x-1">→</span>
                     </>
                   )}
-                </button>
+                </BoldButton>
               </div>
             </div>
           </motion.form>
