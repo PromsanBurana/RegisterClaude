@@ -35,7 +35,7 @@ export default function FAQ() {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
 
   return (
-    <Section id="faq" tone="bg">
+    <Section id="faq" tone="surface">
       <Container size="lg">
         <SectionHeader
           align="center"
@@ -44,7 +44,7 @@ export default function FAQ() {
           description="คำถามที่พบบ่อย — หากยังไม่มีคำตอบ ติดต่อทีมงานได้เลย"
         />
 
-        <div className="mt-12 sm:mt-14 rounded-2xl border border-line bg-surface divide-y divide-line">
+        <div className="mt-12 sm:mt-14 rounded-3xl border border-line bg-surface shadow-soft divide-y divide-line overflow-hidden">
           {faqs.map((f, i) => {
             const isOpen = openIdx === i;
             return (
@@ -54,21 +54,29 @@ export default function FAQ() {
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.04 }}
-                className="px-5 sm:px-7"
+                className={`relative px-5 sm:px-7 transition-colors ${
+                  isOpen ? 'bg-elevated' : 'hover:bg-elevated/60'
+                }`}
               >
+                {isOpen && (
+                  <span
+                    aria-hidden
+                    className="absolute left-0 top-3 bottom-3 w-1 rounded-r-full bg-gradient-brand"
+                  />
+                )}
                 <button
                   onClick={() => setOpenIdx(isOpen ? null : i)}
                   className="w-full py-5 sm:py-6 flex items-center gap-5 text-left group"
                   aria-expanded={isOpen}
                 >
-                  <span className="flex-1 text-base sm:text-lg font-medium text-fg group-hover:text-fg transition-colors">
+                  <span className="flex-1 text-base sm:text-lg font-semibold text-ink">
                     {f.q}
                   </span>
                   <span
-                    className={`flex-shrink-0 inline-flex h-8 w-8 items-center justify-center rounded-full border border-line transition-all ${
+                    className={`flex-shrink-0 inline-flex h-8 w-8 items-center justify-center rounded-full border transition-all ${
                       isOpen
-                        ? 'bg-accent text-white border-accent rotate-45'
-                        : 'text-fg-secondary group-hover:border-line-strong group-hover:text-fg'
+                        ? 'bg-brand-orange text-white border-brand-orange rotate-45'
+                        : 'bg-surface text-fg-secondary border-line group-hover:border-line-strong group-hover:text-ink'
                     }`}
                   >
                     <svg

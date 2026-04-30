@@ -1,27 +1,20 @@
 import Container from './ui/Container';
 import { ButtonAnchor } from './ui/Button';
+import MeshBackdrop from './ui/MeshBackdrop';
 
 export default function Footer() {
   return (
-    <footer className="relative border-t border-line bg-bg overflow-hidden">
-      {/* Subtle bottom glow */}
-      <div
-        aria-hidden
-        className="glow-orb absolute -top-20 left-1/2 -translate-x-1/2 h-[280px] w-[640px] opacity-30"
-        style={{
-          background:
-            'radial-gradient(closest-side, rgba(99,102,241,0.4), rgba(99,102,241,0) 70%)',
-        }}
-      />
+    <footer className="relative overflow-hidden border-t border-line bg-bg">
+      <MeshBackdrop intensity="subtle" />
 
       <Container size="xl" className="relative pt-20 pb-12 sm:pt-24 sm:pb-14">
         {/* CTA */}
         <div className="grid lg:grid-cols-12 gap-10 items-end pb-14 sm:pb-16 border-b border-line">
           <div className="lg:col-span-7">
-            <h2 className="text-display-2 font-semibold text-fg text-balance">
+            <h2 className="text-display-2 font-bold text-ink text-balance">
               Ready to build
               <br />
-              <span className="text-fg-secondary">something real?</span>
+              <span className="text-gradient-warm">something cool?</span>
             </h2>
             <p className="mt-4 text-base text-fg-secondary max-w-md">
               เปลี่ยนจาก "ลอง prompt" → "ทำของจริง" ภายในคลาสเดียว
@@ -41,18 +34,17 @@ export default function Footer() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mt-14 sm:mt-16">
           <div className="col-span-2 sm:col-span-1">
             <div className="flex items-center gap-2.5">
-              <span className="relative inline-flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-accent to-accent-cyan">
-                <span className="absolute inset-[1px] rounded-[5px] bg-bg/40" />
-                <span className="relative font-display text-[13px] font-semibold text-fg">
+              <span className="relative inline-flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-brand bg-[length:200%_200%] animate-gradient-shift">
+                <span className="font-display text-[13px] font-extrabold text-white">
                   C
                 </span>
               </span>
-              <span className="text-sm font-semibold text-fg">
+              <span className="text-sm font-bold text-ink">
                 Claude Workshop
               </span>
             </div>
-            <p className="mt-4 text-sm text-fg-muted leading-relaxed max-w-xs">
-              คอร์สเวิร์กช็อปสำหรับคนที่อยากใช้ AI ทำงานจริง — ไม่ใช่แค่ลอง prompt
+            <p className="mt-4 text-sm text-fg-secondary leading-relaxed max-w-xs">
+              เวิร์กช็อปสำหรับคนที่อยากเล่นกับ AI และทำของจริง
             </p>
           </div>
 
@@ -104,7 +96,7 @@ function FooterCol({
 }) {
   return (
     <div>
-      <p className="text-xs font-medium uppercase tracking-[0.2em] text-fg-muted mb-4">
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-fg-muted mb-4">
         {heading}
       </p>
       <ul className="space-y-2.5 text-sm">
@@ -112,7 +104,7 @@ function FooterCol({
           <li key={it.label}>
             <a
               href={it.href}
-              className="text-fg-secondary hover:text-fg transition-colors"
+              className="text-fg-secondary hover:text-ink transition-colors"
             >
               {it.label}
             </a>

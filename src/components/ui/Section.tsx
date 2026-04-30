@@ -1,6 +1,6 @@
 import { forwardRef, type HTMLAttributes, type ReactNode } from 'react';
 
-type Tone = 'bg' | 'surface';
+type Tone = 'bg' | 'surface' | 'gradient-soft';
 
 type Props = HTMLAttributes<HTMLElement> & {
   id?: string;
@@ -12,6 +12,8 @@ type Props = HTMLAttributes<HTMLElement> & {
 const TONE: Record<Tone, string> = {
   bg: 'bg-bg',
   surface: 'bg-surface',
+  'gradient-soft':
+    'bg-gradient-to-b from-bg via-surface to-bg',
 };
 
 const Section = forwardRef<HTMLElement, Props>(function Section(

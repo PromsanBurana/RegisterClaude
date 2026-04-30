@@ -30,7 +30,7 @@ export default function Filters({
   const hasFilter = !!(search || courseId || batchId || status);
 
   return (
-    <div className="rounded-xl border border-line bg-surface p-4 sm:p-5">
+    <div className="rounded-2xl border border-line bg-surface p-4 sm:p-5 shadow-soft">
       <div className="grid lg:grid-cols-12 gap-3">
         <div className="lg:col-span-5">
           <label className="label" htmlFor="filter-search">
@@ -99,12 +99,10 @@ export default function Filters({
 
       {hasFilter && (
         <div className="mt-4 pt-4 border-t border-line flex items-center justify-between">
-          <p className="text-xs text-fg-muted">
-            Filters active
-          </p>
+          <p className="text-xs text-fg-muted">Filters active</p>
           <button
             onClick={onClear}
-            className="text-xs font-medium text-fg-secondary hover:text-fg transition-colors"
+            className="text-xs font-semibold text-brand-purple hover:text-brand-pink transition-colors"
           >
             Clear all
           </button>

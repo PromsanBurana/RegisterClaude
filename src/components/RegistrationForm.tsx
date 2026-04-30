@@ -5,9 +5,9 @@ import { createRegistration, ApiError } from '../api';
 import Container from './ui/Container';
 import Section from './ui/Section';
 import SectionHeader from './ui/SectionHeader';
-import Card from './ui/Card';
 import Button from './ui/Button';
 import { Input, Textarea, Select, FormField } from './ui/Input';
+import MeshBackdrop from './ui/MeshBackdrop';
 
 export type RegistrationData = {
   fullName: string;
@@ -106,8 +106,9 @@ const RegistrationForm = forwardRef<HTMLElement, Props>(
     };
 
     return (
-      <Section id="register" ref={ref} tone="surface">
-        <Container size="lg">
+      <Section id="register" ref={ref} tone="bg" className="overflow-hidden">
+        <MeshBackdrop intensity="subtle" />
+        <Container size="lg" className="relative">
           <SectionHeader
             align="center"
             eyebrow="Apply"
@@ -115,20 +116,22 @@ const RegistrationForm = forwardRef<HTMLElement, Props>(
               <>
                 Get in.
                 <br />
-                <span className="text-fg-secondary">Get building.</span>
+                <span className="text-gradient-cool">Get building.</span>
               </>
             }
             description="กรอกแบบฟอร์มเพื่อสมัคร ทีมงานจะติดต่อกลับเพื่อยืนยันที่นั่งภายใน 24 ชั่วโมง"
             className="mx-auto"
           />
 
-          <Card tone="surface" size="lg" className="mt-12 sm:mt-14">
-            <motion.form
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-50px' }}
+            transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-12 sm:mt-14 rounded-3xl border border-line bg-surface shadow-card p-6 sm:p-9"
+          >
+            <form
               onSubmit={handleSubmit}
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               className="grid sm:grid-cols-2 gap-x-5 gap-y-6"
             >
               <FormField label="ชื่อ-นามสกุล" required error={errors.fullName} full>
@@ -222,7 +225,7 @@ const RegistrationForm = forwardRef<HTMLElement, Props>(
                 <motion.div
                   initial={{ opacity: 0, y: -4 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="sm:col-span-2 rounded-lg border border-status-red/40 bg-status-red/8 px-4 py-3 text-sm text-status-red"
+                  className="sm:col-span-2 rounded-xl border border-status-red/30 bg-status-red/8 px-4 py-3 text-sm text-status-red"
                 >
                   {submitError}
                 </motion.div>
@@ -235,7 +238,7 @@ const RegistrationForm = forwardRef<HTMLElement, Props>(
                 <Button
                   type="submit"
                   variant="primary"
-                  size="md"
+                  size="lg"
                   disabled={submitting}
                   className="group"
                 >
@@ -254,8 +257,8 @@ const RegistrationForm = forwardRef<HTMLElement, Props>(
                   )}
                 </Button>
               </div>
-            </motion.form>
-          </Card>
+            </form>
+          </motion.div>
         </Container>
       </Section>
     );

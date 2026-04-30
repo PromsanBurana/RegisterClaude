@@ -48,15 +48,15 @@ export default function RegistrationsTable({
   pendingId,
 }: Props) {
   return (
-    <div className="rounded-xl border border-line bg-surface overflow-hidden">
+    <div className="rounded-2xl border border-line bg-surface overflow-hidden shadow-soft">
       <div className="overflow-x-auto">
         <table className="w-full text-sm border-collapse min-w-[1100px]">
           <thead>
-            <tr className="border-b border-line bg-surface sticky top-0">
+            <tr className="border-b border-line bg-elevated sticky top-0 z-[1]">
               {HEADERS.map((h) => (
                 <th
                   key={h}
-                  className="px-4 py-3 text-left text-[11px] font-medium uppercase tracking-[0.16em] text-fg-muted whitespace-nowrap"
+                  className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.16em] text-fg-muted whitespace-nowrap"
                 >
                   {h}
                 </th>
@@ -79,7 +79,7 @@ export default function RegistrationsTable({
                   <td className="px-4 py-3 font-mono text-xs text-fg-secondary whitespace-nowrap">
                     {formatDate(r.createdAt)}
                   </td>
-                  <td className="px-4 py-3 font-medium text-fg whitespace-nowrap">
+                  <td className="px-4 py-3 font-semibold text-ink whitespace-nowrap">
                     {r.fullName}
                   </td>
                   <td className="px-4 py-3 font-mono text-xs text-fg-secondary whitespace-nowrap">
@@ -108,7 +108,7 @@ export default function RegistrationsTable({
                       <button
                         onClick={() => onView(r)}
                         title="View detail"
-                        className="h-8 px-2.5 text-xs font-medium text-fg-secondary hover:text-fg border border-line rounded-md hover:border-line-strong hover:bg-elevated transition-colors"
+                        className="h-8 px-2.5 text-xs font-semibold text-fg-secondary hover:text-ink border border-line rounded-lg hover:border-line-strong hover:bg-elevated transition-colors"
                       >
                         View
                       </button>
@@ -121,7 +121,7 @@ export default function RegistrationsTable({
                           )
                         }
                         disabled={pending}
-                        className="h-8 px-2 text-xs font-medium text-fg-secondary bg-transparent border border-line rounded-md cursor-pointer hover:border-line-strong hover:text-fg disabled:opacity-50"
+                        className="h-8 px-2 text-xs font-semibold text-fg-secondary bg-surface border border-line rounded-lg cursor-pointer hover:border-line-strong hover:text-ink disabled:opacity-50 focus:outline-none focus:border-brand-purple"
                       >
                         {STATUS_ORDER.map((s) => (
                           <option key={s} value={s}>
@@ -133,7 +133,7 @@ export default function RegistrationsTable({
                         onClick={() => onDelete(r.id)}
                         disabled={pending}
                         title="Delete"
-                        className="h-8 w-8 inline-flex items-center justify-center text-status-red border border-status-red/30 rounded-md hover:bg-status-red/10 hover:border-status-red transition-colors disabled:opacity-50"
+                        className="h-8 w-8 inline-flex items-center justify-center text-status-red border border-status-red/30 rounded-lg hover:bg-status-red/10 hover:border-status-red transition-colors disabled:opacity-50"
                         aria-label="Delete"
                       >
                         <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">

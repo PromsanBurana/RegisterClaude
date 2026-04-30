@@ -28,19 +28,18 @@ export default function Navbar() {
       transition={{ duration: 0.5 }}
       className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'border-b border-line bg-bg/75 backdrop-blur-xl'
+          ? 'border-b border-line bg-bg/80 backdrop-blur-xl'
           : 'border-b border-transparent bg-transparent'
       }`}
     >
       <Container size="xl" className="flex items-center justify-between h-16">
         <a href="#top" className="flex items-center gap-2.5 group">
-          <span className="relative inline-flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-accent to-accent-cyan">
-            <span className="absolute inset-[1px] rounded-[5px] bg-bg/40" />
-            <span className="relative font-display text-[13px] font-semibold text-fg">
+          <span className="relative inline-flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-brand bg-[length:200%_200%] animate-gradient-shift shadow-soft">
+            <span className="font-display text-[14px] font-extrabold text-white">
               C
             </span>
           </span>
-          <span className="text-sm font-semibold tracking-tight text-fg">
+          <span className="text-[15px] font-bold tracking-tight text-ink">
             Claude Workshop
           </span>
         </a>
@@ -50,7 +49,7 @@ export default function Navbar() {
             <a
               key={l.href}
               href={l.href}
-              className="px-3 py-2 text-sm text-fg-secondary hover:text-fg transition-colors"
+              className="px-3 py-2 text-sm font-medium text-fg-secondary hover:text-ink transition-colors"
             >
               {l.label}
             </a>
@@ -58,12 +57,6 @@ export default function Navbar() {
         </nav>
 
         <div className="hidden md:flex items-center gap-2">
-          <a
-            href="#courses"
-            className="text-sm text-fg-secondary hover:text-fg transition-colors px-3 py-2"
-          >
-            Pricing
-          </a>
           <ButtonAnchor href="#register" variant="primary" size="sm">
             Apply now
             <span aria-hidden>→</span>
@@ -73,21 +66,21 @@ export default function Navbar() {
         <button
           aria-label="menu"
           onClick={() => setOpen((s) => !s)}
-          className="md:hidden h-9 w-9 rounded-lg border border-line bg-surface flex items-center justify-center text-fg"
+          className="md:hidden h-9 w-9 rounded-xl border border-line bg-surface flex items-center justify-center text-ink shadow-soft"
         >
           <div className="space-y-1">
             <span
-              className={`block h-px w-4 bg-current transition-transform ${
+              className={`block h-0.5 w-4 bg-current transition-transform ${
                 open ? 'translate-y-[5px] rotate-45' : ''
               }`}
             />
             <span
-              className={`block h-px w-4 bg-current transition-opacity ${
+              className={`block h-0.5 w-4 bg-current transition-opacity ${
                 open ? 'opacity-0' : ''
               }`}
             />
             <span
-              className={`block h-px w-4 bg-current transition-transform ${
+              className={`block h-0.5 w-4 bg-current transition-transform ${
                 open ? '-translate-y-[5px] -rotate-45' : ''
               }`}
             />
@@ -102,7 +95,7 @@ export default function Navbar() {
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="md:hidden overflow-hidden border-t border-line bg-bg/95 backdrop-blur-xl"
+            className="md:hidden overflow-hidden border-t border-line bg-surface/95 backdrop-blur-xl"
           >
             <Container size="xl" className="py-4 space-y-1">
               {links.map((l) => (
@@ -110,7 +103,7 @@ export default function Navbar() {
                   key={l.href}
                   href={l.href}
                   onClick={() => setOpen(false)}
-                  className="block py-3 px-3 text-sm text-fg-secondary hover:text-fg rounded-lg hover:bg-surface"
+                  className="block py-3 px-3 text-sm font-medium text-fg-secondary hover:text-ink rounded-lg hover:bg-elevated"
                 >
                   {l.label}
                 </a>

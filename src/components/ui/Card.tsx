@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion';
 import type { ReactNode } from 'react';
 
-type Tone = 'surface' | 'elevated' | 'transparent';
+type Tone = 'surface' | 'elevated' | 'gradient-border' | 'tinted-purple' | 'tinted-orange' | 'tinted-cyan' | 'tinted-pink';
 type Size = 'sm' | 'md' | 'lg';
 
 type Props = {
   tone?: Tone;
   hoverable?: boolean;
-  glow?: boolean;
+  glow?: 'purple' | 'orange' | 'cyan' | 'pink' | false;
   className?: string;
   size?: Size;
   children: ReactNode;
@@ -15,15 +15,34 @@ type Props = {
 };
 
 const TONE: Record<Tone, string> = {
-  surface: 'bg-surface',
-  elevated: 'bg-elevated',
-  transparent: 'bg-transparent',
+  surface: 'bg-surface border border-line shadow-soft',
+  elevated: 'bg-surface border border-line shadow-card',
+  'gradient-border': 'border-gradient shadow-soft',
+  'tinted-purple':
+    'bg-gradient-to-br from-brand-purple/8 via-surface to-surface border border-brand-purple/15 shadow-soft',
+  'tinted-orange':
+    'bg-gradient-to-br from-brand-orange/8 via-surface to-surface border border-brand-orange/15 shadow-soft',
+  'tinted-cyan':
+    'bg-gradient-to-br from-brand-cyan/8 via-surface to-surface border border-brand-cyan/15 shadow-soft',
+  'tinted-pink':
+    'bg-gradient-to-br from-brand-pink/8 via-surface to-surface border border-brand-pink/15 shadow-soft',
 };
 
 const PADDING: Record<Size, string> = {
   sm: 'p-5',
   md: 'p-6 sm:p-7',
   lg: 'p-7 sm:p-9',
+};
+
+const GLOW_CLASS: Record<NonNullable<Props['glow']> extends infer X ? Exclude<X, false> : never, string> = {
+  purple:
+    'after:absolute after:inset-0 after:rounded-[inherit] after:opacity-0 hover:after:opacity-100 after:transition-opacity after:duration-500 after:pointer-events-none after:[background:radial-gradient(60%_50%_at_50%_0%,rgba(123,97,255,0.18),transparent_70%)]',
+  orange:
+    'after:absolute after:inset-0 after:rounded-[inherit] after:opacity-0 hover:after:opacity-100 after:transition-opacity after:duration-500 after:pointer-events-none after:[background:radial-gradient(60%_50%_at_50%_0%,rgba(255,122,0,0.16),transparent_70%)]',
+  cyan:
+    'after:absolute after:inset-0 after:rounded-[inherit] after:opacity-0 hover:after:opacity-100 after:transition-opacity after:duration-500 after:pointer-events-none after:[background:radial-gradient(60%_50%_at_50%_0%,rgba(0,194,255,0.18),transparent_70%)]',
+  pink:
+    'after:absolute after:inset-0 after:rounded-[inherit] after:opacity-0 hover:after:opacity-100 after:transition-opacity after:duration-500 after:pointer-events-none after:[background:radial-gradient(60%_50%_at_50%_0%,rgba(255,78,205,0.18),transparent_70%)]',
 };
 
 export default function Card({
@@ -43,27 +62,14 @@ export default function Card({
       transition={{ duration: 0.55, delay, ease: [0.16, 1, 0.3, 1] }}
       whileHover={
         hoverable
-          ? {
-              y: -3,
-              transition: { duration: 0.2, ease: 'easeOut' },
-            }
+          ? { y: -4, transition: { duration: 0.2, ease: 'easeOut' } }
           : undefined
       }
-      className={`relative rounded-2xl border border-line ${TONE[tone]} ${PADDING[size]} ${
-        hoverable ? 'transition-shadow hover:border-line-strong hover:shadow-elevated' : ''
-      } ${className}`}
+      className={`relative overflow-hidden rounded-2xl ${TONE[tone]} ${PADDING[size]} ${
+        hoverable ? 'transition-shadow hover:shadow-elevated' : ''
+      } ${glow ? GLOW_CLASS[glow] : ''} ${className}`}
     >
-      {glow && (
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 hover:opacity-100 transition-opacity duration-500"
-          style={{
-            background:
-              'radial-gradient(60% 50% at 50% 0%, rgba(99,102,241,0.15), transparent 70%)',
-          }}
-        />
-      )}
-      <div className="relative">{children}</div>
+      <div className="relative z-[1]">{children}</div>
     </motion.div>
   );
 }

@@ -1,7 +1,10 @@
 import Badge from '../ui/Badge';
 import { STATUS_LABEL, type RegistrationStatus } from '../../types';
 
-const TONE: Record<RegistrationStatus, 'gray' | 'blue' | 'green' | 'red'> = {
+const TONE: Record<
+  RegistrationStatus,
+  'gray' | 'blue' | 'green' | 'red'
+> = {
   new: 'gray',
   contacted: 'blue',
   confirmed: 'green',

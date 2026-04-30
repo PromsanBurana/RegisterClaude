@@ -71,7 +71,7 @@ export function FormField({
     <div className={full ? 'sm:col-span-2' : ''}>
       <label htmlFor={htmlFor} className="label">
         {label}
-        {required && <span className="ml-1 text-status-red">*</span>}
+        {required && <span className="ml-1 text-brand-orange">*</span>}
       </label>
       {children}
       {hint && !error && (

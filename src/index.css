@@ -11,35 +11,34 @@
   }
 
   body {
-    @apply bg-bg text-fg font-sans antialiased;
+    @apply bg-bg text-ink font-sans antialiased;
     font-feature-settings: 'cv11', 'ss01', 'ss03';
   }
 
   ::selection {
-    background: rgba(99, 102, 241, 0.35);
-    color: #fafafa;
+    background: rgba(123, 97, 255, 0.25);
+    color: #111111;
   }
 
-  /* Subtle scrollbar */
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
   }
   ::-webkit-scrollbar-track {
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: #262626;
-    border-radius: 4px;
+    background: #d4d4d8;
+    border-radius: 5px;
+    border: 2px solid #f7f7fb;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #3f3f46;
+    background: #a1a1aa;
   }
 
-  /* Native dropdown options keep theme on dark backgrounds */
   select option {
-    background: #111111;
-    color: #fafafa;
+    background: #ffffff;
+    color: #111111;
   }
 
   h1,
@@ -47,76 +46,95 @@
   h3,
   h4,
   h5 {
-    @apply font-display tracking-tight text-fg;
-  }
-
-  body,
-  p,
-  li {
-    font-feature-settings: 'cv11', 'ss01', 'ss03';
+    @apply font-display tracking-tight text-ink;
   }
 }
 
 @layer components {
-  /* Generic ink-on-dark input that other places can compose */
   .field {
-    @apply w-full rounded-lg border border-line bg-elevated px-4 py-3 text-fg placeholder:text-fg-muted text-sm font-medium transition-colors;
+    @apply w-full rounded-xl border border-line bg-surface px-4 py-3 text-ink placeholder:text-fg-muted text-sm font-medium transition-all;
   }
   .field:hover {
     @apply border-line-strong;
   }
   .field:focus {
-    @apply outline-none border-accent;
-    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.18);
+    @apply outline-none border-brand-purple;
+    box-shadow: 0 0 0 4px rgba(123, 97, 255, 0.18);
   }
   .field:disabled {
-    @apply opacity-50 cursor-not-allowed;
+    @apply opacity-50 cursor-not-allowed bg-elevated;
   }
 
   .label {
-    @apply block text-xs font-medium text-fg-secondary mb-2;
+    @apply block text-xs font-semibold text-fg-secondary mb-2;
   }
 
   .eyebrow {
-    @apply inline-flex items-center gap-2 rounded-full border border-line bg-surface/60 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-fg-secondary;
+    @apply inline-flex items-center gap-2 rounded-full border border-line bg-surface/80 backdrop-blur px-3.5 py-1.5 text-xs font-medium text-fg-secondary shadow-soft;
   }
 
-  .link-quiet {
-    @apply text-fg-secondary hover:text-fg transition-colors;
+  /* Gradient text helper */
+  .text-gradient-brand {
+    background: linear-gradient(110deg, #7b61ff 0%, #ff4ecd 50%, #00c2ff 100%);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+  .text-gradient-warm {
+    background: linear-gradient(110deg, #ff7a00 0%, #ff4ecd 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+  .text-gradient-cool {
+    background: linear-gradient(110deg, #7b61ff 0%, #00c2ff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
   }
 
-  .divider {
-    @apply h-px bg-line;
+  /* Cards */
+  .surface-card {
+    @apply rounded-2xl border border-line bg-surface shadow-soft;
   }
 }
 
 @layer utilities {
-  .grid-pattern {
-    background-image: linear-gradient(
-        to right,
-        rgba(255, 255, 255, 0.04) 1px,
-        transparent 1px
-      ),
-      linear-gradient(
-        to bottom,
-        rgba(255, 255, 255, 0.04) 1px,
-        transparent 1px
-      );
-    background-size: 56px 56px;
+  /* Mesh hero gradient */
+  .bg-mesh {
+    background-color: #f7f7fb;
+    background-image: var(--tw-bg, none);
   }
 
   .text-balance {
     text-wrap: balance;
   }
 
-  /* Soft, premium card surface */
-  .surface-card {
-    @apply bg-surface border border-line rounded-2xl;
+  /* Soft dotted pattern for subtle backgrounds */
+  .bg-dots {
+    background-image: radial-gradient(
+      rgba(17, 17, 17, 0.06) 1px,
+      transparent 1px
+    );
+    background-size: 22px 22px;
   }
 
-  /* Used for hero/section glow blobs */
+  /* Used for animated gradient borders */
+  .border-gradient {
+    position: relative;
+    background:
+      linear-gradient(#ffffff, #ffffff) padding-box,
+      linear-gradient(135deg, #7b61ff 0%, #ff4ecd 50%, #00c2ff 100%) border-box;
+    border: 1px solid transparent;
+  }
+
   .glow-orb {
     pointer-events: none;
-    filter: blur(80px);
+    filter: blur(70px);
+    will-change: transform, opacity;
   }
 }

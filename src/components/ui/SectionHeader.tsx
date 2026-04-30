@@ -29,7 +29,7 @@ export default function SectionHeader({
       className={`flex flex-col gap-5 max-w-2xl ${alignClass} ${className}`}
     >
       {eyebrow && <span className="eyebrow">{eyebrow}</span>}
-      <h2 className="text-display-2 font-semibold text-fg text-balance">
+      <h2 className="text-display-2 font-bold text-ink text-balance">
         {title}
       </h2>
       {description && (

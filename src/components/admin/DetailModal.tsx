@@ -28,7 +28,7 @@ export default function DetailModal({ registration, onClose }: Props) {
         <div className="px-6 py-7 space-y-6">
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div>
-              <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-fg-muted">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-fg-muted">
                 ID
               </p>
               <p className="mt-1 font-mono text-xs text-fg-secondary break-all">
@@ -61,7 +61,7 @@ export default function DetailModal({ registration, onClose }: Props) {
           </div>
 
           <div className="border-t border-line pt-5">
-            <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-fg-muted">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-fg-muted">
               ความคาดหวัง
             </p>
             <p className="mt-2 text-sm leading-relaxed whitespace-pre-wrap text-fg-secondary">
@@ -93,11 +93,11 @@ function Field({
 }) {
   return (
     <div>
-      <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-fg-muted">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-fg-muted">
         {label}
       </p>
       <p
-        className={`mt-1 text-fg ${
+        className={`mt-1 text-ink ${
           mono ? 'font-mono text-sm' : 'text-base font-medium'
         }`}
       >

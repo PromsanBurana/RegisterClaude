@@ -50,7 +50,7 @@ export default function Modal({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
           onClick={onClose}
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bg/70 backdrop-blur-md"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-ink/40 backdrop-blur-md"
         >
           <motion.div
             onClick={(e) => e.stopPropagation()}
@@ -63,7 +63,7 @@ export default function Modal({
             {(title || showClose) && (
               <div className="sticky top-0 z-10 flex items-center justify-between gap-3 px-6 py-4 border-b border-line bg-surface/95 backdrop-blur">
                 {title ? (
-                  <h3 className="text-sm font-medium text-fg">{title}</h3>
+                  <h3 className="text-sm font-semibold text-ink">{title}</h3>
                 ) : (
                   <span aria-hidden />
                 )}
@@ -71,7 +71,7 @@ export default function Modal({
                   <button
                     onClick={onClose}
                     aria-label="Close"
-                    className="h-8 w-8 inline-flex items-center justify-center rounded-md text-fg-secondary hover:text-fg hover:bg-elevated transition-colors"
+                    className="h-8 w-8 inline-flex items-center justify-center rounded-lg text-fg-secondary hover:text-ink hover:bg-elevated transition-colors"
                   >
                     <svg
                       viewBox="0 0 16 16"

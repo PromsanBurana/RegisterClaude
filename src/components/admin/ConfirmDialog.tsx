@@ -23,9 +23,7 @@ export default function ConfirmDialog({
   return (
     <Modal open={open} onClose={onCancel} size="sm" showClose={false}>
       <div className="px-6 py-6">
-        <h3 className="text-lg font-semibold tracking-tight text-fg">
-          {title}
-        </h3>
+        <h3 className="text-lg font-bold tracking-tight text-ink">{title}</h3>
         <p className="mt-2 text-sm text-fg-secondary leading-relaxed">
           {message}
         </p>

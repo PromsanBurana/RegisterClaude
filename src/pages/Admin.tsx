@@ -118,7 +118,7 @@ export default function Admin() {
   ];
 
   return (
-    <div className="min-h-screen bg-bg text-fg">
+    <div className="min-h-screen bg-bg text-ink">
       <AdminHeader
         total={data.length}
         loading={loading}
@@ -194,18 +194,18 @@ export default function Admin() {
 
 function PageIntro() {
   return (
-    <div className="rounded-xl border border-line bg-surface px-5 py-4 flex items-start gap-3">
-      <div className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-md bg-accent/15 text-accent flex-shrink-0">
-        <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <div className="rounded-2xl border border-brand-purple/15 bg-gradient-to-br from-brand-purple/8 via-surface to-surface px-5 py-4 flex items-start gap-3 shadow-soft">
+      <div className="mt-0.5 inline-flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-brand bg-[length:200%_200%] animate-gradient-shift text-white shadow-soft flex-shrink-0">
+        <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="8" cy="8" r="6" />
           <path d="M8 5v3.5" />
           <circle cx="8" cy="11" r="0.5" fill="currentColor" />
         </svg>
       </div>
       <p className="text-sm text-fg-secondary leading-relaxed">
-        <span className="text-fg font-medium">Authenticated session.</span>{' '}
+        <span className="text-ink font-semibold">Authenticated session.</span>{' '}
         การลบ/แก้สถานะถูกบันทึกลง Railway Volume ทันที — แนะนำให้เปลี่ยน password เริ่มต้นและตั้ง{' '}
-        <code className="font-mono text-fg-secondary bg-elevated px-1.5 py-0.5 rounded border border-line text-[11px]">
+        <code className="font-mono text-ink bg-surface px-1.5 py-0.5 rounded border border-line text-[11px]">
           SESSION_SECRET
         </code>{' '}
         ที่แข็งแรงก่อน production
@@ -216,8 +216,8 @@ function PageIntro() {
 
 function LoadingState() {
   return (
-    <div className="rounded-xl border border-line bg-surface p-12 flex items-center justify-center gap-3 text-sm text-fg-secondary">
-      <span className="h-3.5 w-3.5 rounded-full border-2 border-fg-muted border-t-fg animate-spin" />
+    <div className="rounded-2xl border border-line bg-surface p-12 flex items-center justify-center gap-3 text-sm text-fg-secondary shadow-soft">
+      <span className="h-3.5 w-3.5 rounded-full border-2 border-fg-muted border-t-ink animate-spin" />
       Loading registrations...
     </div>
   );
@@ -231,8 +231,8 @@ function ErrorState({
   onRetry: () => void;
 }) {
   return (
-    <div className="rounded-xl border border-status-red/30 bg-status-red/5 p-8 text-center space-y-3">
-      <p className="text-base font-semibold text-status-red">Error</p>
+    <div className="rounded-2xl border border-status-red/30 bg-status-red/5 p-8 text-center space-y-3 shadow-soft">
+      <p className="text-base font-bold text-status-red">Error</p>
       <p className="text-sm font-mono text-fg-secondary">{message}</p>
       <div className="pt-2">
         <Button variant="danger" size="sm" onClick={onRetry}>
@@ -245,8 +245,8 @@ function ErrorState({
 
 function EmptyState() {
   return (
-    <div className="rounded-xl border border-line bg-surface p-12 text-center">
-      <p className="text-2xl sm:text-3xl font-semibold text-fg tracking-tight">
+    <div className="rounded-2xl border border-line bg-surface p-12 text-center shadow-soft">
+      <p className="text-2xl sm:text-3xl font-bold text-ink tracking-tight">
         ยังไม่มีผู้ลงทะเบียน
       </p>
       <p className="mt-3 text-sm text-fg-secondary">
@@ -258,8 +258,8 @@ function EmptyState() {
 
 function NoMatchState({ onClear }: { onClear: () => void }) {
   return (
-    <div className="rounded-xl border border-line bg-surface p-10 text-center">
-      <p className="text-xl font-semibold text-fg">No matches</p>
+    <div className="rounded-2xl border border-line bg-surface p-10 text-center shadow-soft">
+      <p className="text-xl font-bold text-ink">No matches</p>
       <p className="mt-2 text-sm text-fg-secondary">
         ไม่มีรายการที่ตรงกับเงื่อนไขที่เลือก
       </p>

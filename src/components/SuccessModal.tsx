@@ -21,10 +21,10 @@ export default function SuccessModal({ open, data, onClose }: Props) {
           initial={{ scale: 0.6, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.05, type: 'spring', damping: 16, stiffness: 220 }}
-          className="mx-auto h-14 w-14 rounded-full bg-accent/15 border border-accent/40 flex items-center justify-center"
+          className="mx-auto h-16 w-16 rounded-2xl bg-gradient-brand bg-[length:200%_200%] animate-gradient-shift flex items-center justify-center shadow-glow"
         >
           <motion.svg
-            className="h-7 w-7 text-accent"
+            className="h-8 w-8 text-white"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -41,26 +41,27 @@ export default function SuccessModal({ open, data, onClose }: Props) {
           </motion.svg>
         </motion.div>
 
-        <h3 className="mt-6 text-2xl font-semibold text-fg tracking-tight">
-          Application received
+        <h3 className="mt-6 text-2xl font-bold text-ink tracking-tight">
+          You're in!
         </h3>
         <p className="mt-3 text-sm text-fg-secondary leading-relaxed">
           ขอบคุณที่สมัครเข้าคอร์สของเรา
           <br />
-          ทีมงานจะติดต่อกลับเพื่อยืนยันที่นั่งภายใน <span className="text-fg font-medium">24 ชั่วโมง</span>
+          ทีมงานจะติดต่อกลับเพื่อยืนยันที่นั่งภายใน{' '}
+          <span className="text-ink font-semibold">24 ชั่วโมง</span>
         </p>
 
         {course && batch && (
-          <div className="mt-6 text-left rounded-xl border border-line bg-elevated p-4">
-            <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-fg-muted">
+          <div className="mt-6 text-left rounded-2xl border border-line bg-elevated p-4">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-fg-muted">
               Course
             </p>
-            <p className="mt-1 text-sm font-medium text-fg">{course.title}</p>
+            <p className="mt-1 text-sm font-semibold text-ink">{course.title}</p>
             <div className="mt-3 pt-3 border-t border-line">
-              <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-fg-muted">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-fg-muted">
                 Batch
               </p>
-              <p className="mt-1 text-sm text-fg">
+              <p className="mt-1 text-sm text-ink">
                 {batch.label} · {batch.date} · {batch.time}
               </p>
             </div>

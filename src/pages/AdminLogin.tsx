@@ -4,8 +4,8 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
 import { ApiError } from '../api';
 import Button from '../components/ui/Button';
-import Card from '../components/ui/Card';
 import { Input, FormField } from '../components/ui/Input';
+import MeshBackdrop from '../components/ui/MeshBackdrop';
 
 type LocationState = { from?: string };
 
@@ -49,31 +49,22 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen relative bg-bg text-fg flex flex-col">
-      {/* Subtle indigo glow */}
-      <div
-        aria-hidden
-        className="glow-orb absolute top-0 left-1/2 -translate-x-1/2 h-[420px] w-[680px] opacity-50"
-        style={{
-          background:
-            'radial-gradient(closest-side, rgba(99,102,241,0.4), rgba(99,102,241,0) 70%)',
-        }}
-      />
+    <div className="min-h-screen relative bg-bg text-ink flex flex-col overflow-hidden">
+      <MeshBackdrop intensity="normal" />
 
-      <header className="relative border-b border-line">
+      <header className="relative border-b border-line bg-bg/70 backdrop-blur-xl">
         <div className="mx-auto max-w-[1200px] px-5 sm:px-8 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5">
-            <span className="relative inline-flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-accent to-accent-cyan">
-              <span className="absolute inset-[1px] rounded-[5px] bg-bg/40" />
-              <span className="relative font-display text-[13px] font-semibold text-fg">
+            <span className="relative inline-flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-brand bg-[length:200%_200%] animate-gradient-shift shadow-soft">
+              <span className="font-display text-[14px] font-extrabold text-white">
                 C
               </span>
             </span>
-            <span className="text-sm font-semibold text-fg">Claude Workshop</span>
+            <span className="text-sm font-bold text-ink">Claude Workshop</span>
           </Link>
           <Link
             to="/"
-            className="text-sm text-fg-secondary hover:text-fg transition-colors"
+            className="text-sm text-fg-secondary hover:text-ink transition-colors"
           >
             ← Back to site
           </Link>
@@ -87,9 +78,9 @@ export default function AdminLogin() {
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           className="w-full max-w-md"
         >
-          <Card tone="surface" size="lg" className="!p-7 sm:!p-9">
+          <div className="rounded-3xl border border-line bg-surface shadow-card p-7 sm:p-9">
             <div className="text-center">
-              <h1 className="text-3xl font-semibold tracking-tight text-fg">
+              <h1 className="text-3xl font-bold tracking-tight text-ink">
                 Sign in
               </h1>
               <p className="mt-2 text-sm text-fg-secondary">
@@ -125,7 +116,7 @@ export default function AdminLogin() {
                 <motion.div
                   initial={{ opacity: 0, y: -4 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="rounded-lg border border-status-red/40 bg-status-red/10 px-3.5 py-2.5 text-sm text-status-red"
+                  className="rounded-xl border border-status-red/30 bg-status-red/8 px-3.5 py-2.5 text-sm text-status-red"
                 >
                   {error}
                 </motion.div>
@@ -134,7 +125,7 @@ export default function AdminLogin() {
               <Button
                 type="submit"
                 variant="primary"
-                size="md"
+                size="lg"
                 fullWidth
                 disabled={submitting}
               >
@@ -152,25 +143,25 @@ export default function AdminLogin() {
             </form>
 
             <div className="mt-7 pt-5 border-t border-line">
-              <p className="text-xs font-medium uppercase tracking-[0.2em] text-fg-muted mb-2">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-fg-muted mb-2">
                 Default credentials
               </p>
               <p className="text-xs text-fg-secondary leading-relaxed">
                 username:{' '}
-                <code className="font-mono text-fg bg-elevated px-1.5 py-0.5 rounded border border-line">
+                <code className="font-mono text-ink bg-elevated px-1.5 py-0.5 rounded border border-line">
                   admin
                 </code>{' '}
                 · password:{' '}
-                <code className="font-mono text-fg bg-elevated px-1.5 py-0.5 rounded border border-line">
+                <code className="font-mono text-ink bg-elevated px-1.5 py-0.5 rounded border border-line">
                   admin
                 </code>
                 <br />
-                <span className="text-status-red">
+                <span className="text-status-red font-medium">
                   เปลี่ยน password ทันทีหลังเข้าใช้ครั้งแรก
                 </span>
               </p>
             </div>
-          </Card>
+          </div>
         </motion.div>
       </main>
     </div>

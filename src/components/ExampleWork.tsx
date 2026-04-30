@@ -19,19 +19,22 @@ export default function ExampleWork() {
                 <>
                   Idea to shipped.
                   <br />
-                  <span className="text-fg-secondary">In thirty minutes.</span>
+                  <span className="text-gradient-warm">In thirty minutes.</span>
                 </>
               }
               description="ผลงานจริงจากผู้เรียนรุ่น 1 ของ Vibe Coding ใช้ Claude Code สร้างเว็บไซต์เต็มรูปแบบและ deploy ใช้งานได้จริง ภายในครึ่งชั่วโมงของคลาส"
             />
 
             <div className="mt-10 grid grid-cols-3 gap-3 max-w-md">
-              {STATS.map((s) => (
+              {STATS.map((s, i) => (
                 <div
                   key={s.label}
-                  className="rounded-xl border border-line bg-bg p-4"
+                  className="rounded-2xl border border-line bg-elevated p-4 transition-shadow hover:shadow-soft"
+                  style={{
+                    transform: `rotate(${[(-1), 0, 1][i] ?? 0}deg)`,
+                  }}
                 >
-                  <p className="text-2xl font-semibold text-fg tracking-tight">
+                  <p className="text-2xl font-bold text-ink tracking-tight">
                     {s.value}
                   </p>
                   <p className="mt-1 text-[11px] text-fg-muted">{s.label}</p>
@@ -85,7 +88,7 @@ function ArrowExternal() {
       className="h-3.5 w-3.5"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.6"
+      strokeWidth="1.8"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
@@ -97,43 +100,40 @@ function ArrowExternal() {
 function BrowserMockup({ url }: { url: string }) {
   return (
     <div className="relative">
-      {/* glow under mockup */}
+      {/* Soft gradient blob behind */}
       <div
         aria-hidden
-        className="glow-orb absolute -inset-x-10 top-1/2 -translate-y-1/2 h-[60%] rounded-full opacity-50"
+        className="glow-orb absolute -inset-x-10 top-1/2 -translate-y-1/2 h-[60%] rounded-full"
         style={{
           background:
-            'radial-gradient(closest-side, rgba(99,102,241,0.35), rgba(99,102,241,0) 70%)',
+            'radial-gradient(closest-side, rgba(123,97,255,0.25), rgba(255,78,205,0.15) 50%, transparent 80%)',
         }}
       />
-      <div className="relative rounded-2xl overflow-hidden border border-line bg-bg shadow-elevated">
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-line bg-surface">
-          <span className="h-2.5 w-2.5 rounded-full bg-line-strong" />
-          <span className="h-2.5 w-2.5 rounded-full bg-line-strong" />
-          <span className="h-2.5 w-2.5 rounded-full bg-line-strong" />
-          <div className="ml-3 flex-1 truncate text-[11px] font-mono text-fg-muted bg-bg rounded-md px-3 py-1.5 border border-line">
+      <div className="relative rounded-3xl overflow-hidden border border-line bg-surface shadow-card">
+        <div className="flex items-center gap-2 px-4 py-3 border-b border-line bg-elevated">
+          <span className="h-2.5 w-2.5 rounded-full bg-brand-orange" />
+          <span className="h-2.5 w-2.5 rounded-full bg-brand-purple" />
+          <span className="h-2.5 w-2.5 rounded-full bg-brand-cyan" />
+          <div className="ml-3 flex-1 truncate text-[11px] font-mono text-fg-muted bg-surface rounded-md px-3 py-1.5 border border-line">
             {url.replace('https://', '')}
           </div>
-          <Badge tone="accent" size="sm">
+          <Badge tone="green" size="sm">
+            <span className="h-1.5 w-1.5 rounded-full bg-status-green" />
             Live
           </Badge>
         </div>
 
-        <div className="relative aspect-[16/10] bg-bg flex items-center justify-center p-8 grid-pattern">
+        <div className="relative aspect-[16/10] flex items-center justify-center p-8 bg-bg">
           <div
             aria-hidden
-            className="absolute inset-0"
-            style={{
-              background:
-                'radial-gradient(ellipse 60% 50% at 50% 40%, rgba(99,102,241,0.18), transparent 70%)',
-            }}
+            className="absolute inset-0 bg-mesh-hero opacity-50"
           />
           <div className="relative text-center max-w-xs">
             <p className="text-[10px] font-mono uppercase tracking-[0.3em] text-fg-muted">
               Live preview
             </p>
-            <p className="mt-3 text-3xl sm:text-4xl font-semibold text-fg tracking-tight">
-              ผลงานรุ่น 01
+            <p className="mt-3 text-3xl sm:text-4xl font-bold text-ink tracking-tight">
+              ผลงาน<span className="text-gradient-brand">รุ่น 01</span>
             </p>
             <p className="mt-3 text-sm text-fg-secondary leading-relaxed">
               เว็บใช้งานจริงที่สร้างขึ้นใน 30 นาที
@@ -142,7 +142,7 @@ function BrowserMockup({ url }: { url: string }) {
               href={url}
               target="_blank"
               rel="noreferrer"
-              className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:text-accent-hover transition-colors"
+              className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-purple hover:text-brand-pink transition-colors"
             >
               เปิดในแท็บใหม่
               <ArrowExternal />
