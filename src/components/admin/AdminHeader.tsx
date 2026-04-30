@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { useAuth } from '../../hooks/useAuth';
-import BoldButton from '../ui/BoldButton';
+import Button from '../ui/Button';
+import Container from '../ui/Container';
+import Badge from '../ui/Badge';
 
 type Props = {
   total: number;
@@ -24,68 +25,97 @@ export default function AdminHeader({
   };
 
   return (
-    <header className="relative bg-sun text-ink border-b-3 border-ink overflow-hidden">
-      <div className="absolute inset-0 grid-lines pointer-events-none" />
-      <div className="relative container-narrow section-padding py-8 md:py-10">
-        <div className="flex flex-wrap items-start gap-6 justify-between">
-          <div className="flex-1 min-w-[260px]">
-            <div className="flex items-center gap-3 flex-wrap text-ink">
-              <Link
-                to="/"
-                className="font-mono text-[11px] uppercase tracking-[0.25em] hover:underline"
-              >
-                ← Back to site
-              </Link>
-              {user && (
-                <span className="font-mono text-[11px] uppercase tracking-[0.25em] opacity-70">
-                  · signed in as{' '}
-                  <span className="text-ink font-bold">{user.username}</span>{' '}
-                  <span className="bg-ink text-sun px-1.5 py-0.5 ml-1">
-                    {user.role}
-                  </span>
+    <header className="sticky top-0 z-40 border-b border-line bg-bg/85 backdrop-blur-xl">
+      <Container size="xl" className="py-4">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4 min-w-0">
+            <Link to="/" className="flex items-center gap-2.5 shrink-0">
+              <span className="relative inline-flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-accent to-accent-cyan">
+                <span className="absolute inset-[1px] rounded-[5px] bg-bg/40" />
+                <span className="relative font-display text-[13px] font-semibold text-fg">
+                  C
                 </span>
+              </span>
+              <span className="text-sm font-semibold text-fg hidden sm:inline">
+                Claude Workshop
+              </span>
+            </Link>
+            <span className="hidden sm:block w-px h-5 bg-line" />
+            <div className="min-w-0">
+              <h1 className="text-base sm:text-lg font-semibold text-fg tracking-tight truncate">
+                Admin Dashboard
+              </h1>
+              {user && (
+                <p className="text-xs text-fg-muted truncate">
+                  Signed in as{' '}
+                  <span className="text-fg-secondary">{user.username}</span>
+                </p>
               )}
             </div>
-            <motion.h1
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="mt-3 font-display text-display-2 uppercase tracking-tight leading-[0.9]"
-            >
-              Admin<br />
-              <span className="text-stroke">Control</span> /
-            </motion.h1>
-            <p className="mt-3 text-sm md:text-base font-medium max-w-xl">
-              ข้อมูลผู้ลงทะเบียนคอร์ส — อ่านสดจาก Railway Volume
-            </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
-            <span className="hidden sm:inline-flex tag-pill bg-ink text-sun border-ink">
-              <span className="font-mono">/ {total} records</span>
-            </span>
-            <BoldButton
-              variant="outline-ink"
-              size="md"
+          <div className="flex items-center gap-2">
+            <Badge tone="gray" size="md" className="hidden sm:inline-flex">
+              {total} records
+            </Badge>
+            <Button
+              variant="secondary"
+              size="sm"
               onClick={onRefresh}
               disabled={loading}
+              aria-label="Refresh"
             >
               {loading ? (
-                <span className="h-3.5 w-3.5 border-2 border-ink/40 border-t-ink rounded-full animate-spin" />
+                <span className="h-3.5 w-3.5 rounded-full border-2 border-fg-muted border-t-fg animate-spin" />
               ) : (
-                <span aria-hidden>↻</span>
+                <RefreshIcon />
               )}
-              Refresh
-            </BoldButton>
-            <BoldButton variant="ink" size="md" onClick={onExport}>
-              <span aria-hidden>↓</span> Export CSV
-            </BoldButton>
-            <BoldButton variant="signal" size="md" onClick={handleLogout}>
-              <span aria-hidden>↩</span> Logout
-            </BoldButton>
+              <span className="hidden sm:inline">Refresh</span>
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={onExport}
+              aria-label="Export"
+            >
+              <DownloadIcon />
+              <span className="hidden sm:inline">Export CSV</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleLogout}
+              aria-label="Logout"
+            >
+              <LogoutIcon />
+              <span className="hidden sm:inline">Sign out</span>
+            </Button>
           </div>
         </div>
-      </div>
+      </Container>
     </header>
+  );
+}
+
+function RefreshIcon() {
+  return (
+    <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 8a6 6 0 1 1-1.8-4.3" />
+      <polyline points="14 3 14 6 11 6" />
+    </svg>
+  );
+}
+function DownloadIcon() {
+  return (
+    <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M8 3v8M4 8l4 4 4-4M3 14h10" />
+    </svg>
+  );
+}
+function LogoutIcon() {
+  return (
+    <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 3H4v10h5M11 8H7M9 6l2 2-2 2" />
+    </svg>
   );
 }

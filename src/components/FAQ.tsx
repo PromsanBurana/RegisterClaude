@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import SectionTitle from './ui/SectionTitle';
+import Container from './ui/Container';
+import Section from './ui/Section';
+import SectionHeader from './ui/SectionHeader';
 
 const faqs = [
   {
@@ -33,15 +35,16 @@ export default function FAQ() {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
 
   return (
-    <section id="faq" className="relative bg-paper border-b-3 border-ink">
-      <div className="container-narrow section-padding py-20 md:py-28">
-        <SectionTitle
-          number="05"
+    <Section id="faq" tone="bg">
+      <Container size="lg">
+        <SectionHeader
+          align="center"
           eyebrow="FAQ"
-          title={<>Got Questions?<br />Same.</>}
+          title="Got questions?"
+          description="คำถามที่พบบ่อย — หากยังไม่มีคำตอบ ติดต่อทีมงานได้เลย"
         />
 
-        <div className="mt-14 border-t-3 border-ink">
+        <div className="mt-12 sm:mt-14 rounded-2xl border border-line bg-surface divide-y divide-line">
           {faqs.map((f, i) => {
             const isOpen = openIdx === i;
             return (
@@ -51,31 +54,29 @@ export default function FAQ() {
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.04 }}
-                className={`border-b-3 border-ink ${
-                  isOpen ? 'bg-sun' : 'bg-paper hover:bg-cream'
-                } transition-colors`}
+                className="px-5 sm:px-7"
               >
                 <button
                   onClick={() => setOpenIdx(isOpen ? null : i)}
-                  className="w-full px-2 md:px-6 py-6 md:py-8 flex items-center gap-6 text-left group"
+                  className="w-full py-5 sm:py-6 flex items-center gap-5 text-left group"
+                  aria-expanded={isOpen}
                 >
-                  <span className="font-mono text-sm md:text-base font-bold w-12 flex-shrink-0">
-                    /0{i + 1}
-                  </span>
-                  <span className="flex-1 font-display text-2xl md:text-4xl uppercase tracking-tight leading-tight">
+                  <span className="flex-1 text-base sm:text-lg font-medium text-fg group-hover:text-fg transition-colors">
                     {f.q}
                   </span>
                   <span
-                    className={`flex-shrink-0 h-12 w-12 md:h-14 md:w-14 border-3 border-ink flex items-center justify-center transition-all ${
-                      isOpen ? 'bg-ink text-sun rotate-45' : 'bg-paper'
+                    className={`flex-shrink-0 inline-flex h-8 w-8 items-center justify-center rounded-full border border-line transition-all ${
+                      isOpen
+                        ? 'bg-accent text-white border-accent rotate-45'
+                        : 'text-fg-secondary group-hover:border-line-strong group-hover:text-fg'
                     }`}
                   >
                     <svg
-                      className="h-5 w-5"
                       viewBox="0 0 16 16"
+                      className="h-3.5 w-3.5"
                       fill="none"
                       stroke="currentColor"
-                      strokeWidth="2.5"
+                      strokeWidth="2"
                       strokeLinecap="round"
                     >
                       <path d="M8 3v10M3 8h10" />
@@ -88,10 +89,10 @@ export default function FAQ() {
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.3 }}
+                      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                       className="overflow-hidden"
                     >
-                      <div className="px-2 md:px-6 pb-8 pl-[3.5rem] md:pl-[4.5rem] text-base md:text-lg font-medium leading-relaxed max-w-3xl">
+                      <div className="pb-6 pr-12 text-sm sm:text-base text-fg-secondary leading-relaxed">
                         {f.a}
                       </div>
                     </motion.div>
@@ -101,7 +102,7 @@ export default function FAQ() {
             );
           })}
         </div>
-      </div>
-    </section>
+      </Container>
+    </Section>
   );
 }

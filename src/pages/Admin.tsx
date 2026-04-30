@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
 import {
   deleteRegistration,
   getRegistrations,
@@ -7,12 +6,14 @@ import {
 } from '../api';
 import type { Registration, RegistrationStatus } from '../types';
 import { courses } from '../data/courses';
+import Container from '../components/ui/Container';
 import AdminHeader from '../components/admin/AdminHeader';
 import StatsCards from '../components/admin/StatsCards';
 import Filters from '../components/admin/Filters';
 import RegistrationsTable from '../components/admin/RegistrationsTable';
 import DetailModal from '../components/admin/DetailModal';
 import ConfirmDialog from '../components/admin/ConfirmDialog';
+import Button from '../components/ui/Button';
 
 export default function Admin() {
   const [data, setData] = useState<Registration[]>([]);
@@ -36,9 +37,7 @@ export default function Admin() {
       setData(rows);
     } catch (err) {
       setError(
-        err instanceof Error
-          ? err.message
-          : 'ไม่สามารถโหลดข้อมูลได้',
+        err instanceof Error ? err.message : 'ไม่สามารถโหลดข้อมูลได้',
       );
     } finally {
       setLoading(false);
@@ -53,8 +52,8 @@ export default function Admin() {
     const q = search.trim().toLowerCase();
     return data.filter((r) => {
       if (q) {
-        const haystack = `${r.fullName} ${r.phone} ${r.email} ${r.company}`.toLowerCase();
-        if (!haystack.includes(q)) return false;
+        const hay = `${r.fullName} ${r.phone} ${r.email} ${r.company}`.toLowerCase();
+        if (!hay.includes(q)) return false;
       }
       if (courseFilter && r.courseId !== courseFilter) return false;
       if (batchFilter && r.batchId !== batchFilter) return false;
@@ -105,28 +104,12 @@ export default function Admin() {
   const handleExport = () => exportCsv(filtered);
 
   const statCards = [
+    { label: 'Total', value: String(stats.total), caption: 'ผู้ลงทะเบียนทั้งหมด' },
+    { label: 'Vibe Coding', value: String(stats.vibe), caption: 'คอร์ส Vibe Coding' },
+    { label: 'Cowork', value: String(stats.cowork), caption: 'คอร์ส Claude Cowork' },
+    { label: 'Today', value: String(stats.today), caption: 'ลงทะเบียนวันนี้' },
     {
-      label: 'Total',
-      value: String(stats.total),
-      caption: 'จำนวนผู้ลงทะเบียนทั้งหมด',
-    },
-    {
-      label: 'Vibe Coding',
-      value: String(stats.vibe),
-      caption: 'ผู้สมัครคอร์ส Vibe Coding',
-    },
-    {
-      label: 'Cowork',
-      value: String(stats.cowork),
-      caption: 'ผู้สมัครคอร์ส Claude Cowork',
-    },
-    {
-      label: 'Today',
-      value: String(stats.today),
-      caption: 'ลงทะเบียนวันนี้',
-    },
-    {
-      label: 'Top Batch',
+      label: 'Top batch',
       value: stats.topBatch.label,
       caption: stats.topBatch.count
         ? `${stats.topBatch.count} คน`
@@ -135,7 +118,7 @@ export default function Admin() {
   ];
 
   return (
-    <div className="min-h-screen bg-bone text-ink">
+    <div className="min-h-screen bg-bg text-fg">
       <AdminHeader
         total={data.length}
         loading={loading}
@@ -143,51 +126,54 @@ export default function Admin() {
         onExport={handleExport}
       />
 
-      <main className="container-narrow section-padding py-8 md:py-10 space-y-6">
-        <SecurityNotice />
+      <Container size="xl" className="py-8 sm:py-10">
+        <div className="space-y-6">
+          <PageIntro />
+          <StatsCards stats={statCards} />
+          <Filters
+            search={search}
+            courseId={courseFilter}
+            batchId={batchFilter}
+            status={statusFilter}
+            onSearch={setSearch}
+            onCourse={setCourseFilter}
+            onBatch={setBatchFilter}
+            onStatus={setStatusFilter}
+            onClear={handleClearFilters}
+          />
 
-        <StatsCards stats={statCards} />
+          {loading && <LoadingState />}
+          {!loading && error && <ErrorState message={error} onRetry={load} />}
+          {!loading && !error && data.length === 0 && <EmptyState />}
+          {!loading && !error && data.length > 0 && filtered.length === 0 && (
+            <NoMatchState onClear={handleClearFilters} />
+          )}
 
-        <Filters
-          search={search}
-          courseId={courseFilter}
-          batchId={batchFilter}
-          status={statusFilter}
-          onSearch={setSearch}
-          onCourse={setCourseFilter}
-          onBatch={setBatchFilter}
-          onStatus={setStatusFilter}
-          onClear={handleClearFilters}
-        />
-
-        {loading && <LoadingState />}
-        {!loading && error && <ErrorState message={error} onRetry={load} />}
-        {!loading && !error && data.length === 0 && <EmptyState />}
-        {!loading && !error && data.length > 0 && filtered.length === 0 && (
-          <NoMatchState onClear={handleClearFilters} />
-        )}
-
-        {!loading && !error && filtered.length > 0 && (
-          <>
-            <div className="flex items-center justify-between font-mono text-xs uppercase tracking-[0.2em] text-ink/60 px-1">
-              <span>
-                / Showing {filtered.length} of {data.length}
-              </span>
-              <span>/ Live data from Volume</span>
-            </div>
-            <RegistrationsTable
-              rows={filtered}
-              onView={setDetailReg}
-              onChangeStatus={handleChangeStatus}
-              onDelete={(id) => {
-                const reg = data.find((r) => r.id === id) || null;
-                setConfirmDelete(reg);
-              }}
-              pendingId={pendingId}
-            />
-          </>
-        )}
-      </main>
+          {!loading && !error && filtered.length > 0 && (
+            <>
+              <div className="flex items-center justify-between text-xs text-fg-muted">
+                <span>
+                  Showing {filtered.length} of {data.length}
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-status-green" />
+                  Live from Volume
+                </span>
+              </div>
+              <RegistrationsTable
+                rows={filtered}
+                onView={setDetailReg}
+                onChangeStatus={handleChangeStatus}
+                onDelete={(id) => {
+                  const reg = data.find((r) => r.id === id) || null;
+                  setConfirmDelete(reg);
+                }}
+                pendingId={pendingId}
+              />
+            </>
+          )}
+        </div>
+      </Container>
 
       <DetailModal
         registration={detailReg}
@@ -196,9 +182,9 @@ export default function Admin() {
       <ConfirmDialog
         open={!!confirmDelete}
         destructive
-        title="ยืนยันการลบ?"
-        message={`ต้องการลบรายการของ "${confirmDelete?.fullName ?? ''}" หรือไม่ — การลบนี้ไม่สามารถย้อนกลับได้`}
-        confirmLabel="ลบ"
+        title="ลบรายการนี้?"
+        message={`รายการของ "${confirmDelete?.fullName ?? ''}" จะถูกลบถาวร — การลบนี้ไม่สามารถย้อนกลับได้`}
+        confirmLabel="ลบรายการ"
         onConfirm={performDelete}
         onCancel={() => setConfirmDelete(null)}
       />
@@ -206,64 +192,64 @@ export default function Admin() {
   );
 }
 
-function SecurityNotice() {
+function PageIntro() {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -6 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="border-3 border-ink bg-paper px-4 py-3 flex items-start gap-3"
-    >
-      <span className="font-display text-xl text-ink leading-none mt-0.5">
-        ⚐
-      </span>
-      <p className="text-sm font-medium leading-snug">
-        <span className="font-bold uppercase tracking-wider text-ink mr-1.5">
-          Security:
-        </span>
-        เปิดใช้ Login + Role-based access control แล้ว ·
-        <span className="text-signal font-bold mx-1">เปลี่ยน password เริ่มต้น</span>
-        และตั้งค่า{' '}
-        <code className="font-mono bg-cream px-1.5 py-0.5 border border-ink/20">
+    <div className="rounded-xl border border-line bg-surface px-5 py-4 flex items-start gap-3">
+      <div className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-md bg-accent/15 text-accent flex-shrink-0">
+        <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="8" cy="8" r="6" />
+          <path d="M8 5v3.5" />
+          <circle cx="8" cy="11" r="0.5" fill="currentColor" />
+        </svg>
+      </div>
+      <p className="text-sm text-fg-secondary leading-relaxed">
+        <span className="text-fg font-medium">Authenticated session.</span>{' '}
+        การลบ/แก้สถานะถูกบันทึกลง Railway Volume ทันที — แนะนำให้เปลี่ยน password เริ่มต้นและตั้ง{' '}
+        <code className="font-mono text-fg-secondary bg-elevated px-1.5 py-0.5 rounded border border-line text-[11px]">
           SESSION_SECRET
         </code>{' '}
         ที่แข็งแรงก่อน production
       </p>
-    </motion.div>
+    </div>
   );
 }
 
 function LoadingState() {
   return (
-    <div className="border-3 border-ink bg-paper p-12 flex items-center justify-center gap-3 font-mono text-sm uppercase tracking-widest">
-      <span className="h-3 w-3 border-2 border-ink/40 border-t-ink rounded-full animate-spin" />
-      Loading...
+    <div className="rounded-xl border border-line bg-surface p-12 flex items-center justify-center gap-3 text-sm text-fg-secondary">
+      <span className="h-3.5 w-3.5 rounded-full border-2 border-fg-muted border-t-fg animate-spin" />
+      Loading registrations...
     </div>
   );
 }
 
-function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
+function ErrorState({
+  message,
+  onRetry,
+}: {
+  message: string;
+  onRetry: () => void;
+}) {
   return (
-    <div className="border-3 border-signal bg-paper p-8 text-center space-y-3">
-      <p className="font-display text-3xl uppercase text-signal">Error</p>
-      <p className="text-sm font-mono">{message}</p>
-      <button
-        onClick={onRetry}
-        className="mt-2 px-5 py-2.5 border-3 border-signal text-signal font-bold uppercase text-sm hover:bg-signal hover:text-cream transition-colors"
-      >
-        ลองอีกครั้ง
-      </button>
+    <div className="rounded-xl border border-status-red/30 bg-status-red/5 p-8 text-center space-y-3">
+      <p className="text-base font-semibold text-status-red">Error</p>
+      <p className="text-sm font-mono text-fg-secondary">{message}</p>
+      <div className="pt-2">
+        <Button variant="danger" size="sm" onClick={onRetry}>
+          ลองอีกครั้ง
+        </Button>
+      </div>
     </div>
   );
 }
 
 function EmptyState() {
   return (
-    <div className="border-3 border-ink bg-paper p-12 text-center">
-      <p className="font-display text-4xl md:text-5xl uppercase">
-        ยังไม่มี<br />
-        ผู้ลงทะเบียน
+    <div className="rounded-xl border border-line bg-surface p-12 text-center">
+      <p className="text-2xl sm:text-3xl font-semibold text-fg tracking-tight">
+        ยังไม่มีผู้ลงทะเบียน
       </p>
-      <p className="mt-3 text-sm text-ink/60">
+      <p className="mt-3 text-sm text-fg-secondary">
         ลองส่งใบสมัครจากหน้า landing page เพื่อเริ่มต้น
       </p>
     </div>
@@ -272,17 +258,16 @@ function EmptyState() {
 
 function NoMatchState({ onClear }: { onClear: () => void }) {
   return (
-    <div className="border-3 border-ink bg-paper p-10 text-center">
-      <p className="font-display text-3xl uppercase">No matches</p>
-      <p className="mt-2 text-sm text-ink/60">
-        ไม่มีรายการที่ตรงกับเงื่อนไขที่ค้นหา
+    <div className="rounded-xl border border-line bg-surface p-10 text-center">
+      <p className="text-xl font-semibold text-fg">No matches</p>
+      <p className="mt-2 text-sm text-fg-secondary">
+        ไม่มีรายการที่ตรงกับเงื่อนไขที่เลือก
       </p>
-      <button
-        onClick={onClear}
-        className="mt-5 px-5 py-2.5 border-3 border-ink font-bold uppercase text-sm hover:bg-ink hover:text-cream transition-colors"
-      >
-        Clear filters
-      </button>
+      <div className="mt-5">
+        <Button variant="secondary" size="sm" onClick={onClear}>
+          Clear filters
+        </Button>
+      </div>
     </div>
   );
 }

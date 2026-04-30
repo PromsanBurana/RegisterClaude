@@ -1,69 +1,147 @@
-import { motion } from 'framer-motion';
-import SectionTitle from './ui/SectionTitle';
+import Container from './ui/Container';
+import Section from './ui/Section';
+import SectionHeader from './ui/SectionHeader';
+import Card from './ui/Card';
 
 const reasons = [
-  { n: '01', title: 'เร็วขึ้น 10x', desc: 'ใช้ AI ช่วยร่นเวลา จากชั่วโมงเป็นนาที' },
-  { n: '02', title: 'ทำงานจริงได้', desc: 'Hands-on workshop ออกจากคลาสได้ผลงานจริง' },
-  { n: '03', title: 'ไม่ต้องเริ่มจากศูนย์', desc: 'มี template และเทคนิคให้ใช้ได้ทันที' },
-  { n: '04', title: 'AI อย่างเป็นระบบ', desc: 'เข้าใจ workflow ที่ถูกต้อง ไม่ใช่ prompt มั่ว' },
-  { n: '05', title: 'กลุ่มเล็ก คุยตัวต่อตัว', desc: 'ปรึกษาได้ทุกประเด็น ผู้สอนดูแลทุกคน' },
-  { n: '06', title: 'ต่อยอดได้ไม่สิ้นสุด', desc: 'นำเทคนิคไปสร้างระบบของตัวเองต่อได้' },
+  {
+    icon: BoltIcon,
+    title: 'Ship 10× faster',
+    desc: 'ใช้ AI ช่วยร่นเวลา จากชั่วโมงเป็นนาที ขจัด overhead ที่ไม่จำเป็น',
+  },
+  {
+    icon: TargetIcon,
+    title: 'Hands-on, not theory',
+    desc: 'ลงมือทำจริงตลอดคลาส ออกจากห้องด้วยผลงานที่ใช้ได้',
+  },
+  {
+    icon: SparkleIcon,
+    title: 'Templates included',
+    desc: 'มี template และ prompt ที่ผ่านการทดสอบแล้ว นำกลับไปใช้ต่อได้ทันที',
+  },
+  {
+    icon: BrainIcon,
+    title: 'Systems mindset',
+    desc: 'เข้าใจ workflow แบบมืออาชีพ ไม่ใช่ prompt แบบสุ่ม',
+  },
+  {
+    icon: UsersIcon,
+    title: 'Small cohorts',
+    desc: 'กลุ่มเล็ก ผู้สอนตอบทุกคำถาม ปรึกษาเป็นรายบุคคลได้',
+  },
+  {
+    icon: InfinityIcon,
+    title: 'Compounds over time',
+    desc: 'เทคนิคที่นำไปต่อยอดได้ ใช้ในงานจริงระยะยาว ไม่ใช่แค่คลาสนี้',
+  },
 ];
 
 export default function WhyJoin() {
   return (
-    <section id="why" className="relative bg-sun border-b-3 border-ink">
-      <div className="container-narrow section-padding py-20 md:py-28">
-        <SectionTitle
-          number="03"
-          eyebrow="Why Join"
-          title={<>No Theory.<br />Only Output.</>}
-          subtitle="เราโฟกัสที่ผลลัพธ์จริง — คุณจะออกจากคลาสพร้อมผลงานและทักษะที่ใช้ได้ทันที"
+    <Section id="why" tone="bg">
+      <Container>
+        <SectionHeader
+          eyebrow="Why join"
+          title={
+            <>
+              No theory.
+              <br />
+              <span className="text-fg-secondary">Only output.</span>
+            </>
+          }
+          description="เราโฟกัสที่ผลลัพธ์ — ออกจากคลาสพร้อมผลงานและทักษะที่ใช้ได้จริงในงานของคุณ"
         />
 
-        <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-0 border-3 border-ink bg-ink">
-          {reasons.map((r, idx) => (
-            <motion.div
-              key={r.n}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.45, delay: idx * 0.06 }}
-              className={`group relative p-6 md:p-8 bg-paper hover:bg-ink hover:text-sun transition-colors duration-300 ${getBorders(idx)}`}
+        <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {reasons.map((r, i) => (
+            <Card
+              key={r.title}
+              tone="surface"
+              hoverable
+              size="md"
+              delay={i * 0.05}
             >
-              <div className="flex items-start justify-between">
-                <span className="font-display leading-none tracking-tight text-6xl md:text-7xl">
-                  {r.n}
-                </span>
-                <span className="font-display text-2xl opacity-0 group-hover:opacity-100 transition-opacity">
-                  →
-                </span>
-              </div>
-              <h3 className="mt-8 font-display text-2xl md:text-3xl uppercase tracking-tight leading-tight">
-                {r.title}
-              </h3>
-              <p className="mt-3 text-sm md:text-base font-medium leading-snug max-w-xs opacity-80">
+              <r.icon />
+              <h3 className="mt-6 text-lg font-semibold text-fg">{r.title}</h3>
+              <p className="mt-2 text-sm text-fg-secondary leading-relaxed">
                 {r.desc}
               </p>
-            </motion.div>
+            </Card>
           ))}
         </div>
-      </div>
-    </section>
+      </Container>
+    </Section>
   );
 }
 
-function getBorders(idx: number) {
-  // Build a precise border map for the 3-col / 2-col grid (6 items)
-  // sm = 2 cols (rows: [0,1], [2,3], [4,5])
-  // lg = 3 cols (rows: [0,1,2], [3,4,5])
-  const cls: string[] = [];
-  // Bottom borders for non-final rows
-  if (idx < 4) cls.push('sm:border-b-3');
-  if (idx < 3) cls.push('lg:border-b-3');
-  // Right borders for non-rightmost columns
-  if (idx % 2 === 0) cls.push('sm:border-r-3');
-  if (idx % 3 !== 2) cls.push('lg:border-r-3');
-  cls.push('border-ink', 'border-b-3 last:border-b-0');
-  return cls.join(' ');
+function IconWrapper({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-line bg-elevated text-accent">
+      {children}
+    </div>
+  );
+}
+
+function BoltIcon() {
+  return (
+    <IconWrapper>
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z" />
+      </svg>
+    </IconWrapper>
+  );
+}
+
+function TargetIcon() {
+  return (
+    <IconWrapper>
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="9" />
+        <circle cx="12" cy="12" r="5" />
+        <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+      </svg>
+    </IconWrapper>
+  );
+}
+
+function SparkleIcon() {
+  return (
+    <IconWrapper>
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M5.6 18.4l2.8-2.8M15.6 8.4l2.8-2.8" />
+      </svg>
+    </IconWrapper>
+  );
+}
+
+function BrainIcon() {
+  return (
+    <IconWrapper>
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M9 4a3 3 0 0 0-3 3 3 3 0 0 0-3 3 3 3 0 0 0 1.5 2.6A3 3 0 0 0 6 17a3 3 0 0 0 3 3V4zM15 4a3 3 0 0 1 3 3 3 3 0 0 1 3 3 3 3 0 0 1-1.5 2.6A3 3 0 0 1 18 17a3 3 0 0 1-3 3V4z" />
+      </svg>
+    </IconWrapper>
+  );
+}
+
+function UsersIcon() {
+  return (
+    <IconWrapper>
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="9" cy="8" r="3.5" />
+        <path d="M2.5 20a6.5 6.5 0 0 1 13 0" />
+        <path d="M16 11a3.2 3.2 0 0 0 0-6.4M21.5 20a5.6 5.6 0 0 0-4-5.4" />
+      </svg>
+    </IconWrapper>
+  );
+}
+
+function InfinityIcon() {
+  return (
+    <IconWrapper>
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M5 12c0-2.5 2-4.5 4.5-4.5S14 9.5 14.5 12c.5 2.5 2.5 4.5 5 4.5S24 14.5 24 12s-2-4.5-4.5-4.5S15 9.5 14.5 12c-.5 2.5-2.5 4.5-5 4.5S5 14.5 5 12z" />
+      </svg>
+    </IconWrapper>
+  );
 }

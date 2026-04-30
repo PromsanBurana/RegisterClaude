@@ -1,8 +1,8 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { findCourseById } from '../data/courses';
 import type { RegistrationData } from './RegistrationForm';
-import BoldButton from './ui/BoldButton';
+import Modal from './ui/Modal';
+import Button from './ui/Button';
 
 type Props = {
   open: boolean;
@@ -11,113 +11,72 @@ type Props = {
 };
 
 export default function SuccessModal({ open, data, onClose }: Props) {
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', onKey);
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = '';
-    };
-  }, [open, onClose]);
-
   const course = data ? findCourseById(data.courseId) : null;
   const batch = course?.batches.find((b) => b.id === data?.batchId);
 
   return (
-    <AnimatePresence>
-      {open && (
+    <Modal open={open} onClose={onClose} size="md" showClose>
+      <div className="px-7 pt-7 pb-8 text-center">
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-ink/75 backdrop-blur-sm"
+          initial={{ scale: 0.6, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.05, type: 'spring', damping: 16, stiffness: 220 }}
+          className="mx-auto h-14 w-14 rounded-full bg-accent/15 border border-accent/40 flex items-center justify-center"
         >
-          <motion.div
-            onClick={(e) => e.stopPropagation()}
-            initial={{ y: 30, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 30, opacity: 0 }}
-            transition={{ type: 'spring', damping: 22, stiffness: 280 }}
-            className="relative w-full max-w-lg bg-sun border-3 border-ink shadow-offset-lg"
+          <motion.svg
+            className="h-7 w-7 text-accent"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           >
-            <div className="flex items-center justify-between px-5 py-3 border-b-3 border-ink bg-ink text-sun">
-              <span className="font-mono text-xs uppercase tracking-[0.25em]">
-                / Application Received
-              </span>
-              <button
-                onClick={onClose}
-                className="font-display text-xl hover:scale-110 transition-transform"
-                aria-label="close"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="p-6 md:p-10 text-center">
-              <motion.div
-                initial={{ scale: 0, rotate: -45 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ delay: 0.15, type: 'spring', damping: 12 }}
-                className="mx-auto h-24 w-24 bg-ink text-sun border-3 border-ink flex items-center justify-center"
-              >
-                <svg
-                  className="h-12 w-12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <motion.path
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ delay: 0.3, duration: 0.5 }}
-                    d="M5 12l4 4L19 7"
-                  />
-                </svg>
-              </motion.div>
-
-              <h3 className="mt-6 font-display text-4xl md:text-5xl uppercase leading-none tracking-tight">
-                Application<br />Received.
-              </h3>
-              <p className="mt-4 text-sm md:text-base font-medium leading-snug">
-                ขอบคุณที่สมัครเข้าคอร์สของเรา ทีมงานจะติดต่อกลับเพื่อยืนยันที่นั่ง
-                <br />
-                ภายใน <span className="font-bold">24 ชม.</span>
-              </p>
-
-              {course && batch && (
-                <div className="mt-6 border-3 border-ink p-4 text-left bg-paper">
-                  <p className="font-mono text-[11px] uppercase tracking-[0.25em] opacity-60">
-                    / Course
-                  </p>
-                  <p className="mt-1 font-display text-base uppercase leading-tight">
-                    {course.title}
-                  </p>
-                  <div className="mt-3 pt-3 border-t-2 border-ink/20">
-                    <p className="font-mono text-[11px] uppercase tracking-[0.25em] opacity-60">
-                      / Batch
-                    </p>
-                    <p className="mt-1 text-sm font-bold">
-                      {batch.label} • {batch.date} • {batch.time}
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              <BoldButton variant="ink" size="lg" fullWidth className="mt-8" onClick={onClose}>
-                เรียบร้อย ✦
-              </BoldButton>
-            </div>
-          </motion.div>
+            <motion.path
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              d="M5 12l4 4L19 7"
+            />
+          </motion.svg>
         </motion.div>
-      )}
-    </AnimatePresence>
+
+        <h3 className="mt-6 text-2xl font-semibold text-fg tracking-tight">
+          Application received
+        </h3>
+        <p className="mt-3 text-sm text-fg-secondary leading-relaxed">
+          ขอบคุณที่สมัครเข้าคอร์สของเรา
+          <br />
+          ทีมงานจะติดต่อกลับเพื่อยืนยันที่นั่งภายใน <span className="text-fg font-medium">24 ชั่วโมง</span>
+        </p>
+
+        {course && batch && (
+          <div className="mt-6 text-left rounded-xl border border-line bg-elevated p-4">
+            <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-fg-muted">
+              Course
+            </p>
+            <p className="mt-1 text-sm font-medium text-fg">{course.title}</p>
+            <div className="mt-3 pt-3 border-t border-line">
+              <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-fg-muted">
+                Batch
+              </p>
+              <p className="mt-1 text-sm text-fg">
+                {batch.label} · {batch.date} · {batch.time}
+              </p>
+            </div>
+          </div>
+        )}
+
+        <Button
+          variant="primary"
+          size="md"
+          fullWidth
+          className="mt-7"
+          onClick={onClose}
+        >
+          เรียบร้อย
+        </Button>
+      </div>
+    </Modal>
   );
 }

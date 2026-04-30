@@ -3,8 +3,9 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
 import { ApiError } from '../api';
-import BoldButton from '../components/ui/BoldButton';
-import MarqueeText from '../components/ui/MarqueeText';
+import Button from '../components/ui/Button';
+import Card from '../components/ui/Card';
+import { Input, FormField } from '../components/ui/Input';
 
 type LocationState = { from?: string };
 
@@ -48,138 +49,128 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-sun text-ink flex flex-col">
-      <header className="border-b-3 border-ink bg-ink text-paper">
-        <div className="container-narrow section-padding py-3 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2.5 group">
-            <span className="flex h-9 w-9 items-center justify-center bg-sun text-ink font-display text-xl">
-              ✦
+    <div className="min-h-screen relative bg-bg text-fg flex flex-col">
+      {/* Subtle indigo glow */}
+      <div
+        aria-hidden
+        className="glow-orb absolute top-0 left-1/2 -translate-x-1/2 h-[420px] w-[680px] opacity-50"
+        style={{
+          background:
+            'radial-gradient(closest-side, rgba(99,102,241,0.4), rgba(99,102,241,0) 70%)',
+        }}
+      />
+
+      <header className="relative border-b border-line">
+        <div className="mx-auto max-w-[1200px] px-5 sm:px-8 h-16 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2.5">
+            <span className="relative inline-flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-accent to-accent-cyan">
+              <span className="absolute inset-[1px] rounded-[5px] bg-bg/40" />
+              <span className="relative font-display text-[13px] font-semibold text-fg">
+                C
+              </span>
             </span>
-            <span className="font-display text-base uppercase tracking-tight">
-              Bold/Disruption
-            </span>
+            <span className="text-sm font-semibold text-fg">Claude Workshop</span>
           </Link>
           <Link
             to="/"
-            className="font-mono text-[11px] uppercase tracking-[0.25em] text-paper/70 hover:text-paper transition-colors"
+            className="text-sm text-fg-secondary hover:text-fg transition-colors"
           >
             ← Back to site
           </Link>
         </div>
       </header>
 
-      <MarqueeText
-        items={['ADMIN ACCESS', 'AUTHORIZED ONLY', 'BOLD DISRUPTION']}
-        tone="paper-on-ink"
-        speed="fast"
-      />
-
-      <main className="flex-1 flex items-center justify-center p-5 md:p-10 grid-lines">
+      <main className="relative flex-1 flex items-center justify-center px-4 py-12">
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="w-full max-w-md bg-paper border-3 border-ink shadow-offset-lg"
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full max-w-md"
         >
-          <div className="px-5 py-3 border-b-3 border-ink bg-ink text-paper flex items-center justify-between">
-            <span className="font-mono text-xs uppercase tracking-[0.25em]">
-              / Admin Login
-            </span>
-            <span className="font-mono text-[10px] uppercase tracking-[0.25em] opacity-60">
-              v1
-            </span>
-          </div>
-
-          <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-5">
-            <div>
-              <h1 className="font-display text-4xl md:text-5xl uppercase leading-[0.9] tracking-tight">
-                Sign In
+          <Card tone="surface" size="lg" className="!p-7 sm:!p-9">
+            <div className="text-center">
+              <h1 className="text-3xl font-semibold tracking-tight text-fg">
+                Sign in
               </h1>
-              <p className="mt-2 text-sm text-ink/70">
-                เข้าสู่ระบบเพื่อใช้งาน Admin Dashboard
+              <p className="mt-2 text-sm text-fg-secondary">
+                เข้าใช้ Admin Dashboard
               </p>
             </div>
 
-            <div>
-              <label htmlFor="username" className="label-bw">
-                / Username
-              </label>
-              <input
-                id="username"
-                type="text"
-                autoComplete="username"
-                autoFocus
-                className="input-bw"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                disabled={submitting}
-              />
-            </div>
+            <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+              <FormField label="Username" required htmlFor="username">
+                <Input
+                  id="username"
+                  type="text"
+                  autoComplete="username"
+                  autoFocus
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  disabled={submitting}
+                />
+              </FormField>
 
-            <div>
-              <label htmlFor="password" className="label-bw">
-                / Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                autoComplete="current-password"
-                className="input-bw"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={submitting}
-              />
-            </div>
+              <FormField label="Password" required htmlFor="password">
+                <Input
+                  id="password"
+                  type="password"
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={submitting}
+                />
+              </FormField>
 
-            {error && (
-              <motion.div
-                initial={{ opacity: 0, y: -4 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="border-3 border-signal bg-signal/10 px-4 py-3 text-sm font-bold text-signal"
-              >
-                ↳ {error}
-              </motion.div>
-            )}
-
-            <BoldButton
-              type="submit"
-              variant="ink"
-              size="lg"
-              fullWidth
-              disabled={submitting}
-            >
-              {submitting ? (
-                <>
-                  <span className="h-4 w-4 border-2 border-paper/40 border-t-paper rounded-full animate-spin" />
-                  กำลังเข้าสู่ระบบ...
-                </>
-              ) : (
-                <>
-                  เข้าสู่ระบบ <span aria-hidden>→</span>
-                </>
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="rounded-lg border border-status-red/40 bg-status-red/10 px-3.5 py-2.5 text-sm text-status-red"
+                >
+                  {error}
+                </motion.div>
               )}
-            </BoldButton>
 
-            <div className="border-t-3 border-ink/20 pt-4">
-              <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-ink/50 mb-1">
-                / Default Credentials
+              <Button
+                type="submit"
+                variant="primary"
+                size="md"
+                fullWidth
+                disabled={submitting}
+              >
+                {submitting ? (
+                  <>
+                    <span className="h-4 w-4 inline-block rounded-full border-2 border-white/40 border-t-white animate-spin" />
+                    กำลังเข้าสู่ระบบ...
+                  </>
+                ) : (
+                  <>
+                    เข้าสู่ระบบ <span aria-hidden>→</span>
+                  </>
+                )}
+              </Button>
+            </form>
+
+            <div className="mt-7 pt-5 border-t border-line">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-fg-muted mb-2">
+                Default credentials
               </p>
-              <p className="text-xs text-ink/65">
+              <p className="text-xs text-fg-secondary leading-relaxed">
                 username:{' '}
-                <code className="font-mono font-bold bg-sun px-1.5 py-0.5 border border-ink/30">
+                <code className="font-mono text-fg bg-elevated px-1.5 py-0.5 rounded border border-line">
                   admin
                 </code>{' '}
                 · password:{' '}
-                <code className="font-mono font-bold bg-sun px-1.5 py-0.5 border border-ink/30">
+                <code className="font-mono text-fg bg-elevated px-1.5 py-0.5 rounded border border-line">
                   admin
                 </code>
                 <br />
-                <span className="text-signal">
+                <span className="text-status-red">
                   เปลี่ยน password ทันทีหลังเข้าใช้ครั้งแรก
                 </span>
               </p>
             </div>
-          </form>
+          </Card>
         </motion.div>
       </main>
     </div>

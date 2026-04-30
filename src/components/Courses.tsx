@@ -1,8 +1,11 @@
 import { motion } from 'framer-motion';
 import { courses, type Course } from '../data/courses';
-import SectionTitle from './ui/SectionTitle';
-import BoldButton from './ui/BoldButton';
-import MarqueeText from './ui/MarqueeText';
+import Container from './ui/Container';
+import Section from './ui/Section';
+import SectionHeader from './ui/SectionHeader';
+import Card from './ui/Card';
+import Button from './ui/Button';
+import Badge from './ui/Badge';
 
 type Props = {
   onSelect: (courseId: string) => void;
@@ -10,35 +13,32 @@ type Props = {
 
 export default function Courses({ onSelect }: Props) {
   return (
-    <>
-      <MarqueeText
-        items={['TWO COURSES', 'ZERO FLUFF', 'SHIP REAL WORK']}
-        tone="ink-on-sun"
-        speed="slow"
-      />
+    <Section id="courses" tone="bg">
+      <Container>
+        <SectionHeader
+          eyebrow="The lineup"
+          title={
+            <>
+              Two courses.
+              <br />
+              <span className="text-fg-secondary">No fluff.</span>
+            </>
+          }
+          description="ออกแบบมาให้คุณใช้ AI ทำงานจริงได้ทันทีหลังจบคลาส ไม่ใช่แค่ทำตามตัวอย่างในวิดีโอ"
+        />
 
-      <section id="courses" className="relative bg-paper border-b-3 border-ink">
-        <div className="container-narrow section-padding py-20 md:py-28">
-          <SectionTitle
-            number="01"
-            eyebrow="The Lineup"
-            title={<>Two Courses.<br />Zero Fluff.</>}
-            subtitle="คอร์สเวิร์กช็อปออกแบบมาให้คุณใช้ AI ทำงานจริงได้ทันทีหลังจบคลาส — ไม่ใช่แค่ทำตามตัวอย่าง"
-          />
-
-          <div className="mt-14 grid md:grid-cols-2 gap-0 border-3 border-ink">
-            {courses.map((c, idx) => (
-              <CourseCard
-                key={c.id}
-                course={c}
-                index={idx}
-                onSelect={() => onSelect(c.id)}
-              />
-            ))}
-          </div>
+        <div className="mt-14 grid lg:grid-cols-2 gap-5">
+          {courses.map((c, idx) => (
+            <CourseCard
+              key={c.id}
+              course={c}
+              index={idx}
+              onSelect={() => onSelect(c.id)}
+            />
+          ))}
         </div>
-      </section>
-    </>
+      </Container>
+    </Section>
   );
 }
 
@@ -51,64 +51,39 @@ function CourseCard({
   index: number;
   onSelect: () => void;
 }) {
-  // Card 1 = ink (dark), Card 2 = sun (yellow). Maximum contrast pair.
-  const dark = index === 0;
-  const wrapper = dark
-    ? 'bg-ink text-paper md:border-r-3 border-ink'
-    : 'bg-sun text-ink';
-  const subText = dark ? 'text-paper/65' : 'text-ink/75';
-  const dividerBorder = dark ? 'border-paper/25' : 'border-ink';
-  const tagClass = dark
-    ? 'inline-flex items-center gap-2 px-2.5 py-1 border-2 border-paper text-[11px] font-bold uppercase tracking-[0.18em] text-paper'
-    : 'inline-flex items-center gap-2 px-2.5 py-1 border-2 border-ink text-[11px] font-bold uppercase tracking-[0.18em] text-ink';
-  const batchBox = dark
-    ? 'border-3 border-paper bg-graphite p-3 hover:bg-sun hover:text-ink hover:border-sun transition-colors'
-    : 'border-3 border-ink bg-paper p-3 hover:bg-ink hover:text-sun transition-colors';
-  const buttonVariant = dark ? 'sun' : 'ink';
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-50px' }}
-      transition={{ duration: 0.55, delay: index * 0.1 }}
-      className={`group relative p-6 md:p-10 ${wrapper} transition-colors`}
+    <Card
+      tone="surface"
+      hoverable
+      glow
+      size="lg"
+      delay={index * 0.08}
+      className="flex flex-col"
     >
-      <div className="flex items-center justify-between mb-8">
-        <span className="font-mono text-xs font-bold uppercase tracking-[0.25em]">
-          / Course 0{index + 1}
+      <div className="flex items-start justify-between gap-3">
+        <Badge tone={index === 0 ? 'accent' : 'cyan'} size="md">
+          Course 0{index + 1}
+        </Badge>
+        <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-fg-muted">
+          {course.subtitle}
         </span>
-        <motion.span
-          animate={{ rotate: 360 }}
-          transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
-          className="font-display text-3xl select-none"
-        >
-          ✦
-        </motion.span>
       </div>
 
-      <p className="font-mono text-sm uppercase tracking-widest mb-2 opacity-80">
-        {course.subtitle}
-      </p>
-      <h3 className="font-display text-display-3 uppercase leading-[0.9] tracking-tight mb-6">
+      <h3 className="mt-7 text-display-3 font-semibold text-fg text-balance">
         {course.title}
       </h3>
-
-      <p className={`text-base md:text-lg leading-snug font-medium max-w-md ${subText}`}>
+      <p className="mt-4 text-base text-fg-secondary leading-relaxed">
         {course.description}
       </p>
 
-      <div className={`mt-8 pt-6 border-t-3 ${dividerBorder}`}>
-        <p className="font-mono text-[11px] uppercase tracking-[0.25em] mb-4 opacity-80">
-          / Highlights
+      <div className="mt-7">
+        <p className="text-xs font-medium uppercase tracking-[0.18em] text-fg-muted">
+          Highlights
         </p>
-        <ul className="space-y-2.5">
+        <ul className="mt-4 space-y-2.5">
           {course.highlights.map((h) => (
-            <li
-              key={h}
-              className="flex items-start gap-3 text-[15px] font-medium"
-            >
-              <span className="font-display mt-0.5">→</span>
+            <li key={h} className="flex items-start gap-3 text-sm text-fg">
+              <CheckIcon />
               <span>{h}</span>
             </li>
           ))}
@@ -117,37 +92,67 @@ function CourseCard({
 
       <div className="mt-6 flex flex-wrap gap-1.5">
         {course.audience.map((a) => (
-          <span key={a} className={tagClass}>
+          <span
+            key={a}
+            className="text-[11px] font-medium text-fg-secondary border border-line rounded-full px-2.5 py-0.5"
+          >
             {a}
           </span>
         ))}
       </div>
 
-      <div className={`mt-8 pt-6 border-t-3 ${dividerBorder}`}>
-        <p className="font-mono text-[11px] uppercase tracking-[0.25em] mb-4 opacity-80">
-          / Schedule
+      <div className="mt-8 pt-7 border-t border-line">
+        <p className="text-xs font-medium uppercase tracking-[0.18em] text-fg-muted">
+          Schedule
         </p>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="mt-4 grid sm:grid-cols-2 gap-3">
           {course.batches.map((b) => (
-            <div key={b.id} className={batchBox}>
-              <p className="font-display text-2xl uppercase">{b.label}</p>
-              <p className="text-xs font-bold mt-1">{b.date}</p>
-              <p className="text-xs">{b.time}</p>
+            <div
+              key={b.id}
+              className="rounded-xl border border-line bg-elevated p-3.5 hover:border-line-strong transition-colors"
+            >
+              <p className="text-xs font-medium text-fg-muted">{b.label}</p>
+              <p className="mt-1 text-sm font-medium text-fg">{b.date}</p>
+              <p className="text-xs text-fg-secondary">{b.time}</p>
             </div>
           ))}
         </div>
       </div>
 
-      <BoldButton
-        variant={buttonVariant}
-        size="lg"
+      <Button
+        variant="primary"
+        size="md"
         fullWidth
-        className="mt-8 group/btn"
+        className="mt-7 group"
         onClick={onSelect}
       >
         เลือกคอร์สนี้
-        <span className="transition-transform group-hover/btn:translate-x-1">→</span>
-      </BoldButton>
-    </motion.div>
+        <motion.span
+          aria-hidden
+          className="inline-block"
+          whileHover={{ x: 2 }}
+        >
+          →
+        </motion.span>
+      </Button>
+    </Card>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <span className="inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md bg-accent/12 text-accent mt-0.5">
+      <svg
+        viewBox="0 0 16 16"
+        className="h-3 w-3"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <polyline points="3 8 6.5 11.5 13 4.5" />
+      </svg>
+    </span>
   );
 }

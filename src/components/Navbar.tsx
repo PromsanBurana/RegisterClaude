@@ -1,56 +1,48 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Container from './ui/Container';
+import { ButtonAnchor } from './ui/Button';
 
 const links = [
   { href: '#courses', label: 'Courses' },
-  { href: '#example', label: 'Work' },
-  { href: '#why', label: 'Why' },
+  { href: '#work', label: 'Work' },
+  { href: '#why', label: 'Why us' },
   { href: '#faq', label: 'FAQ' },
 ];
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  const [time, setTime] = useState('');
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 30);
+    const onScroll = () => setScrolled(window.scrollY > 16);
     onScroll();
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  useEffect(() => {
-    const tick = () => {
-      const d = new Date();
-      const hh = String(d.getHours()).padStart(2, '0');
-      const mm = String(d.getMinutes()).padStart(2, '0');
-      setTime(`${hh}:${mm} BKK`);
-    };
-    tick();
-    const id = setInterval(tick, 30_000);
-    return () => clearInterval(id);
-  }, []);
-
   return (
-    <header
-      className={`fixed top-0 inset-x-0 z-50 bg-ink text-paper border-b-3 border-ink transition-all ${
-        scrolled ? 'py-2' : 'py-3'
+    <motion.header
+      initial={{ y: -16, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? 'border-b border-line bg-bg/75 backdrop-blur-xl'
+          : 'border-b border-transparent bg-transparent'
       }`}
     >
-      <div className="container-narrow section-padding flex items-center justify-between gap-4">
-        <a href="#top" className="flex items-center gap-3 group">
-          <span className="flex h-10 w-10 items-center justify-center bg-sun text-ink font-display text-2xl">
-            ✦
+      <Container size="xl" className="flex items-center justify-between h-16">
+        <a href="#top" className="flex items-center gap-2.5 group">
+          <span className="relative inline-flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-accent to-accent-cyan">
+            <span className="absolute inset-[1px] rounded-[5px] bg-bg/40" />
+            <span className="relative font-display text-[13px] font-semibold text-fg">
+              C
+            </span>
           </span>
-          <div className="leading-none">
-            <p className="font-display text-base md:text-lg uppercase tracking-tight">
-              BOLD/DISRUPTION
-            </p>
-            <p className="text-[10px] font-mono uppercase tracking-[0.2em] mt-1 text-paper/55">
-              WORKSHOP — BKK 2025
-            </p>
-          </div>
+          <span className="text-sm font-semibold tracking-tight text-fg">
+            Claude Workshop
+          </span>
         </a>
 
         <nav className="hidden md:flex items-center gap-1">
@@ -58,80 +50,85 @@ export default function Navbar() {
             <a
               key={l.href}
               href={l.href}
-              className="px-4 py-2 text-sm font-bold uppercase tracking-wide hover:bg-sun hover:text-ink transition-colors"
+              className="px-3 py-2 text-sm text-fg-secondary hover:text-fg transition-colors"
             >
               {l.label}
             </a>
           ))}
         </nav>
 
-        <div className="hidden md:flex items-center gap-4">
-          <span className="font-mono text-xs uppercase tracking-widest text-paper/70">
-            {time}
-          </span>
+        <div className="hidden md:flex items-center gap-2">
           <a
-            href="#register"
-            className="inline-flex items-center gap-2 bg-sun text-ink border-3 border-sun px-5 py-2.5 text-xs font-bold uppercase tracking-tight hover:bg-paper hover:border-paper transition-colors"
+            href="#courses"
+            className="text-sm text-fg-secondary hover:text-fg transition-colors px-3 py-2"
           >
-            Apply →
+            Pricing
           </a>
+          <ButtonAnchor href="#register" variant="primary" size="sm">
+            Apply now
+            <span aria-hidden>→</span>
+          </ButtonAnchor>
         </div>
 
         <button
           aria-label="menu"
           onClick={() => setOpen((s) => !s)}
-          className="md:hidden h-10 w-10 bg-sun text-ink flex items-center justify-center"
+          className="md:hidden h-9 w-9 rounded-lg border border-line bg-surface flex items-center justify-center text-fg"
         >
           <div className="space-y-1">
             <span
-              className={`block h-0.5 w-5 bg-ink transition-transform ${
-                open ? 'translate-y-1.5 rotate-45' : ''
+              className={`block h-px w-4 bg-current transition-transform ${
+                open ? 'translate-y-[5px] rotate-45' : ''
               }`}
             />
             <span
-              className={`block h-0.5 w-5 bg-ink transition-opacity ${
+              className={`block h-px w-4 bg-current transition-opacity ${
                 open ? 'opacity-0' : ''
               }`}
             />
             <span
-              className={`block h-0.5 w-5 bg-ink transition-transform ${
-                open ? '-translate-y-1.5 -rotate-45' : ''
+              className={`block h-px w-4 bg-current transition-transform ${
+                open ? '-translate-y-[5px] -rotate-45' : ''
               }`}
             />
           </div>
         </button>
-      </div>
+      </Container>
 
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ height: 0 }}
-            animate={{ height: 'auto' }}
-            exit={{ height: 0 }}
-            className="md:hidden overflow-hidden border-t-3 border-paper/20"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            className="md:hidden overflow-hidden border-t border-line bg-bg/95 backdrop-blur-xl"
           >
-            <div className="container-narrow section-padding py-4 space-y-1">
+            <Container size="xl" className="py-4 space-y-1">
               {links.map((l) => (
                 <a
                   key={l.href}
                   href={l.href}
                   onClick={() => setOpen(false)}
-                  className="block py-3 px-3 font-bold uppercase tracking-wide border-b-2 border-paper/20 hover:bg-sun hover:text-ink"
+                  className="block py-3 px-3 text-sm text-fg-secondary hover:text-fg rounded-lg hover:bg-surface"
                 >
                   {l.label}
                 </a>
               ))}
-              <a
+              <ButtonAnchor
                 href="#register"
                 onClick={() => setOpen(false)}
-                className="block w-full text-center mt-3 bg-sun text-ink border-3 border-sun px-5 py-3 font-bold uppercase tracking-tight"
+                variant="primary"
+                size="md"
+                fullWidth
+                className="mt-2"
               >
-                Apply →
-              </a>
-            </div>
+                Apply now
+              </ButtonAnchor>
+            </Container>
           </motion.div>
         )}
       </AnimatePresence>
-    </header>
+    </motion.header>
   );
 }

@@ -4,77 +4,100 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"IBM Plex Sans Thai"', 'Inter', 'Archivo', 'system-ui', 'sans-serif'],
-        display: ['"Archivo Black"', '"IBM Plex Sans Thai"', 'sans-serif'],
+        sans: [
+          'Inter',
+          '"Inter Variable"',
+          '"IBM Plex Sans Thai"',
+          'system-ui',
+          'sans-serif',
+        ],
+        display: [
+          'Inter',
+          '"Inter Variable"',
+          '"IBM Plex Sans Thai"',
+          'system-ui',
+          'sans-serif',
+        ],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
       },
       colors: {
-        ink: '#050505',
-        graphite: '#1A1A1A',
-        smoke: '#6B6B6B',
-        paper: '#FFFFFF',
-        cream: '#FAFAF7',
-        bone: '#F2F2EE',
-        gray: {
-          soft: '#EAEAEA',
-          mid: '#9A9A9A',
+        bg: '#0A0A0A',
+        surface: '#111111',
+        elevated: '#1A1A1A',
+        line: {
+          DEFAULT: '#262626',
+          strong: '#3F3F46',
         },
-        sun: {
-          DEFAULT: '#FFD400',
-          dark: '#E5BE00',
-          deep: '#C9A800',
+        fg: {
+          DEFAULT: '#FAFAFA',
+          secondary: '#A1A1AA',
+          muted: '#71717A',
         },
-        signal: '#FF1F1F',
-        electric: '#0052FF',
+        accent: {
+          DEFAULT: '#6366F1',
+          hover: '#818CF8',
+          subtle: 'rgba(99, 102, 241, 0.10)',
+          ring: 'rgba(99, 102, 241, 0.30)',
+          cyan: '#22D3EE',
+        },
+        status: {
+          gray: '#71717A',
+          blue: '#3B82F6',
+          green: '#10B981',
+          red: '#EF4444',
+        },
       },
       fontSize: {
-        'display-mega': [
-          'clamp(3.5rem, 14vw, 14rem)',
-          { lineHeight: '0.85', letterSpacing: '-0.045em' },
-        ],
+        // SaaS-tuned, calmer than the old display scale
         'display-1': [
-          'clamp(3rem, 11.5vw, 11.5rem)',
-          { lineHeight: '0.88', letterSpacing: '-0.04em' },
+          'clamp(2.75rem, 6.5vw, 5.5rem)',
+          { lineHeight: '1.02', letterSpacing: '-0.04em' },
         ],
         'display-2': [
-          'clamp(2.5rem, 8.5vw, 8.5rem)',
-          { lineHeight: '0.9', letterSpacing: '-0.03em' },
+          'clamp(2.25rem, 5vw, 4rem)',
+          { lineHeight: '1.05', letterSpacing: '-0.03em' },
         ],
         'display-3': [
-          'clamp(2rem, 5.5vw, 5rem)',
-          { lineHeight: '0.95', letterSpacing: '-0.02em' },
-        ],
-        'display-stat': [
-          'clamp(3.5rem, 11vw, 9rem)',
-          { lineHeight: '0.85', letterSpacing: '-0.04em' },
+          'clamp(1.75rem, 3.6vw, 2.75rem)',
+          { lineHeight: '1.1', letterSpacing: '-0.02em' },
         ],
       },
       animation: {
-        marquee: 'marquee 28s linear infinite',
-        'marquee-slow': 'marquee 50s linear infinite',
-        'marquee-fast': 'marquee 18s linear infinite',
-        'spin-slow': 'spin 14s linear infinite',
-        'spin-slower': 'spin 30s linear infinite',
-        blink: 'blink 1.2s step-end infinite',
+        'fade-in': 'fade-in 0.6s ease-out',
+        'slide-up': 'slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+        'glow-pulse': 'glow-pulse 4s ease-in-out infinite',
+        'shimmer': 'shimmer 2.5s linear infinite',
       },
       keyframes: {
-        marquee: {
-          '0%': { transform: 'translateX(0)' },
-          '100%': { transform: 'translateX(-50%)' },
+        'fade-in': {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
         },
-        blink: {
-          '0%, 50%': { opacity: '1' },
-          '51%, 100%': { opacity: '0' },
+        'slide-up': {
+          '0%': { opacity: '0', transform: 'translateY(8px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
         },
-      },
-      borderWidth: {
-        3: '3px',
-        5: '5px',
+        'glow-pulse': {
+          '0%, 100%': { opacity: '0.45' },
+          '50%': { opacity: '0.7' },
+        },
+        shimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
+        },
       },
       boxShadow: {
-        offset: '6px 6px 0 0 #050505',
-        'offset-lg': '10px 10px 0 0 #050505',
-        'offset-sun': '6px 6px 0 0 #FFD400',
+        soft: '0 1px 0 0 rgba(255,255,255,0.05) inset, 0 8px 24px -12px rgba(0,0,0,0.6)',
+        elevated:
+          '0 1px 0 0 rgba(255,255,255,0.06) inset, 0 18px 48px -16px rgba(0,0,0,0.7)',
+        glow: '0 0 0 1px rgba(99,102,241,0.4), 0 0 32px -4px rgba(99,102,241,0.45)',
+        ring: '0 0 0 4px rgba(99,102,241,0.25)',
+      },
+      backgroundImage: {
+        'gradient-radial':
+          'radial-gradient(closest-side, var(--tw-gradient-stops))',
+        'noise':
+          "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E\")",
       },
     },
   },

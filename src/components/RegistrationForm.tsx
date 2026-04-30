@@ -2,8 +2,12 @@ import { useEffect, useMemo, useState, forwardRef } from 'react';
 import { motion } from 'framer-motion';
 import { courses, findCourseById } from '../data/courses';
 import { createRegistration, ApiError } from '../api';
-import SectionTitle from './ui/SectionTitle';
-import BoldButton from './ui/BoldButton';
+import Container from './ui/Container';
+import Section from './ui/Section';
+import SectionHeader from './ui/SectionHeader';
+import Card from './ui/Card';
+import Button from './ui/Button';
+import { Input, Textarea, Select, FormField } from './ui/Input';
 
 export type RegistrationData = {
   fullName: string;
@@ -102,203 +106,158 @@ const RegistrationForm = forwardRef<HTMLElement, Props>(
     };
 
     return (
-      <section
-        id="register"
-        ref={ref}
-        className="relative bg-paper border-b-3 border-ink"
-      >
-        <div className="container-narrow section-padding py-20 md:py-28">
-          <SectionTitle
-            number="04"
-            eyebrow="Apply Now"
-            title={<>Get In.<br />Get Building.</>}
-            subtitle="กรอกแบบฟอร์มเพื่อสมัคร ทีมงานจะติดต่อกลับเพื่อยืนยันที่นั่งภายใน 24 ชม."
+      <Section id="register" ref={ref} tone="surface">
+        <Container size="lg">
+          <SectionHeader
+            align="center"
+            eyebrow="Apply"
+            title={
+              <>
+                Get in.
+                <br />
+                <span className="text-fg-secondary">Get building.</span>
+              </>
+            }
+            description="กรอกแบบฟอร์มเพื่อสมัคร ทีมงานจะติดต่อกลับเพื่อยืนยันที่นั่งภายใน 24 ชั่วโมง"
+            className="mx-auto"
           />
 
-          <motion.form
-            onSubmit={handleSubmit}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-50px' }}
-            transition={{ duration: 0.6 }}
-            className="mt-12 grid lg:grid-cols-12 gap-0 border-3 border-ink"
-          >
-            {/* Yellow side panel */}
-            <div className="lg:col-span-4 bg-sun text-ink p-6 md:p-10 flex flex-col">
-              <p className="font-mono text-xs uppercase tracking-[0.25em] mb-6">
-                / Form 04
-              </p>
-              <h3 className="font-display text-4xl md:text-5xl uppercase leading-[0.9] tracking-tight">
-                Apply.<br />We Reply.<br />You Build.
-              </h3>
+          <Card tone="surface" size="lg" className="mt-12 sm:mt-14">
+            <motion.form
+              onSubmit={handleSubmit}
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              className="grid sm:grid-cols-2 gap-x-5 gap-y-6"
+            >
+              <FormField label="ชื่อ-นามสกุล" required error={errors.fullName} full>
+                <Input
+                  type="text"
+                  placeholder="สมชาย ใจดี"
+                  value={data.fullName}
+                  onChange={(e) => update('fullName', e.target.value)}
+                />
+              </FormField>
 
-              <div className="mt-10 space-y-4 text-sm font-medium">
-                <div className="flex items-start gap-3">
-                  <span className="font-display text-xl">→</span>
-                  <span>กรอกฟอร์มให้ครบ ใช้เวลาไม่ถึง 2 นาที</span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <span className="font-display text-xl">→</span>
-                  <span>ทีมงานติดต่อกลับใน 24 ชม. เพื่อยืนยันที่นั่ง</span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <span className="font-display text-xl">→</span>
-                  <span>ชำระเงินแล้วรอวันเรียน</span>
-                </div>
-              </div>
+              <FormField label="เบอร์โทร" required error={errors.phone}>
+                <Input
+                  type="tel"
+                  placeholder="08X-XXX-XXXX"
+                  value={data.phone}
+                  onChange={(e) => update('phone', e.target.value)}
+                />
+              </FormField>
 
-              <div className="mt-auto pt-8">
-                <div className="border-t-3 border-ink pt-5">
-                  <p className="font-mono text-[10px] uppercase tracking-[0.3em] opacity-70">
-                    / Status
-                  </p>
-                  <p className="mt-2 flex items-center gap-2 font-bold uppercase">
-                    <span className="h-2 w-2 rounded-full bg-ink animate-blink" />
-                    Now Enrolling
-                  </p>
-                </div>
-              </div>
-            </div>
+              <FormField label="อีเมล" required error={errors.email}>
+                <Input
+                  type="email"
+                  placeholder="you@email.com"
+                  value={data.email}
+                  onChange={(e) => update('email', e.target.value)}
+                />
+              </FormField>
 
-            {/* White form area */}
-            <div className="lg:col-span-8 bg-paper p-6 md:p-10">
-              <div className="grid sm:grid-cols-2 gap-x-6 gap-y-7">
-                <Field label="ชื่อ-นามสกุล" required error={errors.fullName} full>
-                  <input
-                    type="text"
-                    className="input-bw"
-                    placeholder="สมชาย ใจดี"
-                    value={data.fullName}
-                    onChange={(e) => update('fullName', e.target.value)}
-                  />
-                </Field>
+              <FormField label="บริษัท / หน่วยงาน">
+                <Input
+                  type="text"
+                  placeholder="ชื่อบริษัท (optional)"
+                  value={data.company}
+                  onChange={(e) => update('company', e.target.value)}
+                />
+              </FormField>
 
-                <Field label="เบอร์โทร" required error={errors.phone}>
-                  <input
-                    type="tel"
-                    className="input-bw"
-                    placeholder="08X-XXX-XXXX"
-                    value={data.phone}
-                    onChange={(e) => update('phone', e.target.value)}
-                  />
-                </Field>
+              <FormField label="ตำแหน่ง">
+                <Input
+                  type="text"
+                  placeholder="เช่น Developer / PM"
+                  value={data.position}
+                  onChange={(e) => update('position', e.target.value)}
+                />
+              </FormField>
 
-                <Field label="อีเมล" required error={errors.email}>
-                  <input
-                    type="email"
-                    className="input-bw"
-                    placeholder="you@email.com"
-                    value={data.email}
-                    onChange={(e) => update('email', e.target.value)}
-                  />
-                </Field>
-
-                <Field label="บริษัท / หน่วยงาน">
-                  <input
-                    type="text"
-                    className="input-bw"
-                    placeholder="ชื่อบริษัท"
-                    value={data.company}
-                    onChange={(e) => update('company', e.target.value)}
-                  />
-                </Field>
-
-                <Field label="ตำแหน่ง">
-                  <input
-                    type="text"
-                    className="input-bw"
-                    placeholder="Developer / PM / ฯลฯ"
-                    value={data.position}
-                    onChange={(e) => update('position', e.target.value)}
-                  />
-                </Field>
-
-                <Field label="เลือกคอร์ส" required error={errors.courseId} full>
-                  <select
-                    className="input-bw appearance-none cursor-pointer"
-                    value={data.courseId}
-                    onChange={(e) => {
-                      update('courseId', e.target.value);
-                      update('batchId', '');
-                    }}
-                  >
-                    <option value="">— กรุณาเลือกคอร์ส —</option>
-                    {courses.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.title}
-                      </option>
-                    ))}
-                  </select>
-                </Field>
-
-                <Field label="เลือกรอบเรียน" required error={errors.batchId} full>
-                  <select
-                    className="input-bw appearance-none cursor-pointer disabled:opacity-40"
-                    value={data.batchId}
-                    onChange={(e) => update('batchId', e.target.value)}
-                    disabled={!selectedCourse}
-                  >
-                    <option value="">
-                      {selectedCourse
-                        ? '— กรุณาเลือกรอบเรียน —'
-                        : 'โปรดเลือกคอร์สก่อน'}
+              <FormField label="เลือกคอร์ส" required error={errors.courseId} full>
+                <Select
+                  value={data.courseId}
+                  onChange={(e) => {
+                    update('courseId', e.target.value);
+                    update('batchId', '');
+                  }}
+                >
+                  <option value="">— กรุณาเลือกคอร์ส —</option>
+                  {courses.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.title}
                     </option>
-                    {selectedCourse?.batches.map((b) => (
-                      <option key={b.id} value={b.id}>
-                        {b.label} • {b.date} • {b.time}
-                      </option>
-                    ))}
-                  </select>
-                </Field>
+                  ))}
+                </Select>
+              </FormField>
 
-                <Field label="ความคาดหวัง" full>
-                  <textarea
-                    className="input-bw min-h-[100px] resize-y"
-                    placeholder="คุณอยากได้อะไรจากคอร์สนี้..."
-                    value={data.expectation}
-                    onChange={(e) => update('expectation', e.target.value)}
-                  />
-                </Field>
-              </div>
+              <FormField label="เลือกรอบเรียน" required error={errors.batchId} full>
+                <Select
+                  value={data.batchId}
+                  onChange={(e) => update('batchId', e.target.value)}
+                  disabled={!selectedCourse}
+                >
+                  <option value="">
+                    {selectedCourse ? '— กรุณาเลือกรอบเรียน —' : 'โปรดเลือกคอร์สก่อน'}
+                  </option>
+                  {selectedCourse?.batches.map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.label} • {b.date} • {b.time}
+                    </option>
+                  ))}
+                </Select>
+              </FormField>
+
+              <FormField label="ความคาดหวัง" full>
+                <Textarea
+                  placeholder="คุณอยากได้อะไรจากคอร์สนี้... (optional)"
+                  value={data.expectation}
+                  onChange={(e) => update('expectation', e.target.value)}
+                />
+              </FormField>
 
               {submitError && (
                 <motion.div
-                  initial={{ opacity: 0, y: -8 }}
+                  initial={{ opacity: 0, y: -4 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mt-6 border-3 border-signal bg-signal/10 px-4 py-3 text-sm font-bold text-signal"
+                  className="sm:col-span-2 rounded-lg border border-status-red/40 bg-status-red/8 px-4 py-3 text-sm text-status-red"
                 >
-                  ↳ {submitError}
+                  {submitError}
                 </motion.div>
               )}
 
-              <div className="mt-10 pt-6 border-t-3 border-ink flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
-                <p className="text-xs font-mono uppercase tracking-widest opacity-60">
-                  / กดส่งคือยืนยันให้ติดต่อกลับ
+              <div className="sm:col-span-2 mt-3 pt-6 border-t border-line flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
+                <p className="text-xs text-fg-muted">
+                  การกดส่งคือยืนยันให้เราติดต่อกลับเพื่อยืนยันที่นั่ง
                 </p>
-                <BoldButton
+                <Button
                   type="submit"
-                  variant="ink"
-                  size="lg"
+                  variant="primary"
+                  size="md"
                   disabled={submitting}
                   className="group"
                 >
                   {submitting ? (
                     <>
-                      <span className="h-4 w-4 border-2 border-paper/40 border-t-paper rounded-full animate-spin" />
+                      <Spinner />
                       กำลังส่ง...
                     </>
                   ) : (
                     <>
                       ส่งใบสมัคร
-                      <span className="transition-transform group-hover:translate-x-1">→</span>
+                      <span aria-hidden className="transition-transform group-hover:translate-x-0.5">
+                        →
+                      </span>
                     </>
                   )}
-                </BoldButton>
+                </Button>
               </div>
-            </div>
-          </motion.form>
-        </div>
-      </section>
+            </motion.form>
+          </Card>
+        </Container>
+      </Section>
     );
   },
 );
@@ -306,35 +265,8 @@ const RegistrationForm = forwardRef<HTMLElement, Props>(
 RegistrationForm.displayName = 'RegistrationForm';
 export default RegistrationForm;
 
-function Field({
-  label,
-  required,
-  error,
-  full,
-  children,
-}: {
-  label: string;
-  required?: boolean;
-  error?: string;
-  full?: boolean;
-  children: React.ReactNode;
-}) {
+function Spinner() {
   return (
-    <div className={full ? 'sm:col-span-2' : ''}>
-      <label className="label-bw">
-        {label}
-        {required && <span className="text-signal ml-1">*</span>}
-      </label>
-      {children}
-      {error && (
-        <motion.p
-          initial={{ opacity: 0, y: -4 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-2 text-xs font-bold text-signal uppercase tracking-wide"
-        >
-          ↳ {error}
-        </motion.p>
-      )}
-    </div>
+    <span className="h-4 w-4 inline-block rounded-full border-2 border-white/40 border-t-white animate-spin" />
   );
 }
