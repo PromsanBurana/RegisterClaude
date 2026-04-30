@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion';
 import type { ReactNode } from 'react';
 
-type Word = string | { text: string; gradient?: 'brand' | 'warm' | 'cool' };
+type GradientName = 'brand' | 'warm' | 'cool' | 'rainbow';
+
+type Word = string | { text: string; gradient?: GradientName };
 
 type Props = {
   /**
@@ -16,12 +18,19 @@ type Props = {
   charStagger?: number;
 };
 
-const GRADIENT_CLASS = {
+const GRADIENT_CLASS: Record<GradientName, string> = {
   brand: 'text-gradient-brand bg-[length:200%_200%] animate-gradient-text',
   warm: 'text-gradient-warm',
   cool: 'text-gradient-cool',
+  rainbow: 'text-gradient-rainbow',
 };
 
+/**
+ * Stagger-animated headline. Plain words split into chars for a per-character
+ * reveal; gradient words animate as a single block because CSS
+ * `background-clip: text` does not propagate through inline-block child spans
+ * (splitting them would render the gradient text invisible).
+ */
 export default function AnimatedHeadline({
   lines,
   className = '',
@@ -32,14 +41,31 @@ export default function AnimatedHeadline({
   const renderWord = (word: Word, key: string): ReactNode => {
     const text = typeof word === 'string' ? word : word.text;
     const gradient = typeof word === 'string' ? undefined : word.gradient;
+
+    if (gradient) {
+      // Animate the whole gradient word as ONE block.
+      const delay = startDelay + charIndex * charStagger;
+      charIndex += text.length;
+      return (
+        <motion.span
+          key={key}
+          initial={{ y: '110%', opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{
+            duration: 0.6,
+            delay,
+            ease: [0.16, 1, 0.3, 1],
+          }}
+          className={`inline-block whitespace-nowrap will-change-transform ${GRADIENT_CLASS[gradient]}`}
+        >
+          {text}
+        </motion.span>
+      );
+    }
+
     const chars = Array.from(text);
     return (
-      <span
-        key={key}
-        className={`inline-block whitespace-nowrap ${
-          gradient ? GRADIENT_CLASS[gradient] : ''
-        }`}
-      >
+      <span key={key} className="inline-block whitespace-nowrap">
         {chars.map((c, i) => {
           const delay = startDelay + charIndex * charStagger;
           charIndex += 1;
@@ -53,8 +79,7 @@ export default function AnimatedHeadline({
                 delay,
                 ease: [0.16, 1, 0.3, 1],
               }}
-              className="inline-block"
-              style={{ willChange: 'transform' }}
+              className="inline-block will-change-transform"
             >
               {c === ' ' ? ' ' : c}
             </motion.span>
@@ -72,7 +97,7 @@ export default function AnimatedHeadline({
             {line.map((word, wi) => (
               <span key={wi}>
                 {renderWord(word, `${li}-${wi}`)}
-                {wi < line.length - 1 ? ' ' : ''}
+                {wi < line.length - 1 ? ' ' : ''}
               </span>
             ))}
           </span>
