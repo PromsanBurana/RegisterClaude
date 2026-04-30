@@ -103,8 +103,8 @@ export default function Hero() {
               startDelay={0.05}
               charStagger={0.022}
               lines={[
-                ['Build', 'cool', 'stuff'],
-                ['with', { text: 'AI.', gradient: 'brand' }],
+                ['Build', 'cool', 'stuff', 'with'],
+                [{ text: 'Claude Code.', gradient: 'brand' }],
               ]}
             />
           </div>
@@ -166,7 +166,7 @@ export default function Hero() {
           }}
           className="mt-20 sm:mt-24 grid grid-cols-2 lg:grid-cols-4 gap-3"
         >
-          {STATS.map((s, i) => (
+          {STATS.map((s) => (
             <motion.div
               key={s.label}
               variants={{
@@ -176,11 +176,8 @@ export default function Hero() {
               transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
               whileHover={{ y: -4, scale: 1.01 }}
               className="rounded-2xl border border-line bg-surface/85 backdrop-blur p-5 sm:p-6 shadow-soft transition-shadow hover:shadow-card"
-              style={{
-                transform: `rotate(${[(0), -1, 1, 0][i] ?? 0}deg)`,
-              }}
             >
-              <p className="text-3xl sm:text-4xl font-bold tracking-tight text-ink">
+              <p className="text-3xl sm:text-4xl font-bold tracking-tight text-ink tabular-nums">
                 <CountUp value={s.value} padStart={s.padStart} duration={1.6} />
               </p>
               <p className="mt-2 text-xs sm:text-sm text-fg-muted">

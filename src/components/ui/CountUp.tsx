@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useInView } from 'framer-motion';
 
 type Props = {
@@ -14,6 +14,10 @@ type Props = {
 /**
  * Animates the numeric prefix of a value upward when scrolled into view.
  * Non-numeric suffix (e.g. "h", "m", "%") is appended verbatim.
+ *
+ * Note: parsed values are memoized so the count effect doesn't re-fire on
+ * unrelated parent re-renders (which would otherwise reset the number to 0
+ * and look like a flicker / blink).
  */
 export default function CountUp({
   value,
@@ -23,15 +27,30 @@ export default function CountUp({
 }: Props) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: '-50px' });
-  const match = value.match(/^([\d.]+)(.*)$/);
-  const target = match ? parseFloat(match[1]) : 0;
-  const suffix = match ? match[2] : value;
-  const decimals = match ? (match[1].split('.')[1] || '').length : 0;
 
-  const [display, setDisplay] = useState(match ? '0' : value);
+  const parsed = useMemo(() => {
+    const m = value.match(/^([\d.]+)(.*)$/);
+    if (!m) {
+      return { isNumeric: false, target: 0, suffix: value, decimals: 0 };
+    }
+    return {
+      isNumeric: true,
+      target: parseFloat(m[1]),
+      suffix: m[2],
+      decimals: (m[1].split('.')[1] || '').length,
+    };
+  }, [value]);
+
+  const initialDisplay = useMemo(() => {
+    if (!parsed.isNumeric) return value;
+    const zero = (0).toFixed(parsed.decimals);
+    return padStart > 0 ? zero.padStart(padStart, '0') : zero;
+  }, [parsed.isNumeric, parsed.decimals, padStart, value]);
+
+  const [display, setDisplay] = useState(initialDisplay);
 
   useEffect(() => {
-    if (!inView || !match) return;
+    if (!inView || !parsed.isNumeric) return;
     let raf = 0;
     let startTs: number | null = null;
     const tick = (ts: number) => {
@@ -39,19 +58,27 @@ export default function CountUp({
       const elapsed = (ts - startTs) / 1000;
       const progress = Math.min(elapsed / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
-      const current = target * eased;
-      setDisplay(current.toFixed(decimals));
+      const current = parsed.target * eased;
+      const formatted = current.toFixed(parsed.decimals);
+      setDisplay(padStart > 0 ? formatted.padStart(padStart, '0') : formatted);
       if (progress < 1) raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [inView, target, decimals, duration, match]);
+  }, [inView, parsed.isNumeric, parsed.target, parsed.decimals, duration, padStart]);
 
-  const padded = padStart > 0 ? display.padStart(padStart, '0') : display;
+  if (!parsed.isNumeric) {
+    return (
+      <span ref={ref} className={className}>
+        {value}
+      </span>
+    );
+  }
+
   return (
     <span ref={ref} className={className}>
-      {padded}
-      {suffix}
+      {display}
+      {parsed.suffix}
     </span>
   );
 }

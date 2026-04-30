@@ -28,17 +28,14 @@ export default function ExampleWork() {
             />
 
             <div className="mt-10 grid grid-cols-3 gap-3 max-w-md">
-              {STATS.map((s, i) => (
+              {STATS.map((s) => (
                 <motion.div
                   key={s.label}
                   whileHover={{ y: -3, scale: 1.02 }}
                   transition={{ type: 'spring', damping: 16, stiffness: 240 }}
                   className="rounded-2xl border border-line bg-elevated p-4 transition-shadow hover:shadow-soft cursor-default"
-                  style={{
-                    transform: `rotate(${[(-1), 0, 1][i] ?? 0}deg)`,
-                  }}
                 >
-                  <p className="text-2xl font-bold text-ink tracking-tight">
+                  <p className="text-2xl font-bold text-ink tracking-tight tabular-nums">
                     <CountUp value={s.value} duration={1.6} />
                   </p>
                   <p className="mt-1 text-[11px] text-fg-muted">{s.label}</p>
