@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import CountUp from '../ui/CountUp';
 
 type Stat = {
   label: string;
@@ -39,13 +40,16 @@ export default function StatsCards({ stats }: { stats: Stat[] }) {
     <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
       {stats.map((s, i) => {
         const tint = TINTS[i % TINTS.length];
+        // Try to count up if it's purely numeric, else show as-is
+        const isNumeric = /^[\d.]+/.test(s.value);
         return (
           <motion.div
             key={s.label}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: i * 0.05 }}
-            className={`relative rounded-2xl border ${tint.border} ${tint.bg} p-5 shadow-soft hover:shadow-card hover:-translate-y-0.5 transition-all`}
+            whileHover={{ y: -3, scale: 1.01 }}
+            className={`relative rounded-2xl border ${tint.border} ${tint.bg} p-5 shadow-soft hover:shadow-card transition-all`}
           >
             <div className="flex items-center gap-2">
               <span className={`h-1.5 w-1.5 rounded-full ${tint.accent}`} />
@@ -54,11 +58,11 @@ export default function StatsCards({ stats }: { stats: Stat[] }) {
               </p>
             </div>
             <p
-              className={`mt-3 font-bold text-ink tracking-tight ${
+              className={`mt-3 font-bold text-ink tracking-tight tabular-nums ${
                 s.value.length > 12 ? 'text-lg' : 'text-3xl sm:text-4xl'
               }`}
             >
-              {s.value}
+              {isNumeric ? <CountUp value={s.value} duration={1.4} /> : s.value}
             </p>
             {s.caption && (
               <p className="mt-2 text-[11px] text-fg-muted leading-snug">

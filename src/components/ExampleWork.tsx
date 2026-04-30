@@ -4,6 +4,8 @@ import Section from './ui/Section';
 import SectionHeader from './ui/SectionHeader';
 import Badge from './ui/Badge';
 import { ButtonAnchor } from './ui/Button';
+import TiltCard from './ui/TiltCard';
+import CountUp from './ui/CountUp';
 
 const EXAMPLE_URL = 'https://p-oil-project-production.up.railway.app/';
 
@@ -27,18 +29,20 @@ export default function ExampleWork() {
 
             <div className="mt-10 grid grid-cols-3 gap-3 max-w-md">
               {STATS.map((s, i) => (
-                <div
+                <motion.div
                   key={s.label}
-                  className="rounded-2xl border border-line bg-elevated p-4 transition-shadow hover:shadow-soft"
+                  whileHover={{ y: -3, scale: 1.02 }}
+                  transition={{ type: 'spring', damping: 16, stiffness: 240 }}
+                  className="rounded-2xl border border-line bg-elevated p-4 transition-shadow hover:shadow-soft cursor-default"
                   style={{
                     transform: `rotate(${[(-1), 0, 1][i] ?? 0}deg)`,
                   }}
                 >
                   <p className="text-2xl font-bold text-ink tracking-tight">
-                    {s.value}
+                    <CountUp value={s.value} duration={1.6} />
                   </p>
                   <p className="mt-1 text-[11px] text-fg-muted">{s.label}</p>
-                </div>
+                </motion.div>
               ))}
             </div>
 
@@ -66,7 +70,9 @@ export default function ExampleWork() {
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             className="lg:col-span-7 order-1 lg:order-2"
           >
-            <BrowserMockup url={EXAMPLE_URL} />
+            <TiltCard max={4}>
+              <BrowserMockup url={EXAMPLE_URL} />
+            </TiltCard>
           </motion.div>
         </div>
       </Container>

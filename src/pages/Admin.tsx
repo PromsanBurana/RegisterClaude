@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { motion } from 'framer-motion';
 import {
   deleteRegistration,
   getRegistrations,
@@ -11,7 +12,7 @@ import AdminHeader from '../components/admin/AdminHeader';
 import StatsCards from '../components/admin/StatsCards';
 import Filters from '../components/admin/Filters';
 import RegistrationsTable from '../components/admin/RegistrationsTable';
-import DetailModal from '../components/admin/DetailModal';
+import DetailPanel from '../components/admin/DetailPanel';
 import ConfirmDialog from '../components/admin/ConfirmDialog';
 import Button from '../components/ui/Button';
 
@@ -175,7 +176,7 @@ export default function Admin() {
         </div>
       </Container>
 
-      <DetailModal
+      <DetailPanel
         registration={detailReg}
         onClose={() => setDetailReg(null)}
       />
@@ -245,13 +246,50 @@ function ErrorState({
 
 function EmptyState() {
   return (
-    <div className="rounded-2xl border border-line bg-surface p-12 text-center shadow-soft">
-      <p className="text-2xl sm:text-3xl font-bold text-ink tracking-tight">
+    <div className="relative rounded-2xl border border-line bg-surface p-12 text-center shadow-soft overflow-hidden">
+      <EmptyIllustration />
+      <p className="relative text-2xl sm:text-3xl font-bold text-ink tracking-tight">
         ยังไม่มีผู้ลงทะเบียน
       </p>
-      <p className="mt-3 text-sm text-fg-secondary">
+      <p className="relative mt-3 text-sm text-fg-secondary">
         ลองส่งใบสมัครจากหน้า landing page เพื่อเริ่มต้น
       </p>
+    </div>
+  );
+}
+
+function EmptyIllustration() {
+  // Three drifting gradient orbs as a soft "empty" illustration
+  const orbs = [
+    { color: '#7B61FF', size: 120, top: '6%', left: '12%' },
+    { color: '#FF7A00', size: 90, top: '12%', right: '14%' },
+    { color: '#00C2FF', size: 100, bottom: '10%', left: '30%' },
+  ];
+  return (
+    <div aria-hidden className="absolute inset-0 pointer-events-none">
+      {orbs.map((o, i) => (
+        <motion.div
+          key={i}
+          animate={{ y: [0, -10, 0], opacity: [0.45, 0.65, 0.45] }}
+          transition={{
+            duration: 6 + i * 1.4,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: i * 0.4,
+          }}
+          className="absolute rounded-full"
+          style={{
+            width: o.size,
+            height: o.size,
+            top: o.top,
+            left: o.left,
+            right: o.right,
+            bottom: o.bottom,
+            background: `radial-gradient(closest-side, ${o.color}, transparent 70%)`,
+            filter: 'blur(28px)',
+          }}
+        />
+      ))}
     </div>
   );
 }

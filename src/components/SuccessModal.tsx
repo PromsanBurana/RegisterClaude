@@ -3,6 +3,7 @@ import { findCourseById } from '../data/courses';
 import type { RegistrationData } from './RegistrationForm';
 import Modal from './ui/Modal';
 import Button from './ui/Button';
+import Confetti from './ui/Confetti';
 
 type Props = {
   open: boolean;
@@ -16,7 +17,8 @@ export default function SuccessModal({ open, data, onClose }: Props) {
 
   return (
     <Modal open={open} onClose={onClose} size="md" showClose>
-      <div className="px-7 pt-7 pb-8 text-center">
+      <div className="relative px-7 pt-7 pb-8 text-center">
+        <Confetti active={open} />
         <motion.div
           initial={{ scale: 0.6, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}

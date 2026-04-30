@@ -1,9 +1,23 @@
 import Container from './ui/Container';
 import { ButtonAnchor } from './ui/Button';
 import MeshBackdrop from './ui/MeshBackdrop';
+import MarqueeText from './ui/MarqueeText';
 
 export default function Footer() {
   return (
+    <>
+    <MarqueeText
+      items={[
+        'BUILD COOL STUFF',
+        'WITH AI',
+        'CLAUDE CODE',
+        'CLAUDE COWORK',
+        'BANGKOK 2025',
+      ]}
+      tone="light"
+      speed="slow"
+      reverse
+    />
     <footer className="relative overflow-hidden border-t border-line bg-bg">
       <MeshBackdrop intensity="subtle" />
 
@@ -84,6 +98,7 @@ export default function Footer() {
         </div>
       </Container>
     </footer>
+    </>
   );
 }
 

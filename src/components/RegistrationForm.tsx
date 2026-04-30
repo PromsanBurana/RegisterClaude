@@ -42,6 +42,8 @@ const RegistrationForm = forwardRef<HTMLElement, Props>(
   ({ selectedCourseId, onSuccess }, ref) => {
     const [data, setData] = useState<RegistrationData>(initialData);
     const [errors, setErrors] = useState<Errors>({});
+    const [touched, setTouched] = useState<Partial<Record<keyof RegistrationData, boolean>>>({});
+    const [submitAttempted, setSubmitAttempted] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -56,31 +58,71 @@ const RegistrationForm = forwardRef<HTMLElement, Props>(
       [data.courseId],
     );
 
+    const validateField = <K extends keyof RegistrationData>(
+      key: K,
+      value: RegistrationData[K],
+      sourceData: RegistrationData = data,
+    ): string | undefined => {
+      const v = String(value).trim();
+      switch (key) {
+        case 'fullName':
+          if (!v) return 'กรุณากรอกชื่อ-นามสกุล';
+          return;
+        case 'phone':
+          if (!v) return 'กรุณากรอกเบอร์โทร';
+          if (!/^[0-9\-+\s()]{8,}$/.test(v)) return 'รูปแบบเบอร์โทรไม่ถูกต้อง';
+          return;
+        case 'email':
+          if (!v) return 'กรุณากรอกอีเมล';
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return 'รูปแบบอีเมลไม่ถูกต้อง';
+          return;
+        case 'courseId':
+          if (!v) return 'กรุณาเลือกคอร์ส';
+          return;
+        case 'batchId':
+          if (!v) return 'กรุณาเลือกรอบเรียน';
+          return;
+        default:
+          return;
+      }
+      // sourceData is currently unused but kept for future cross-field rules.
+      void sourceData;
+    };
+
     const update = <K extends keyof RegistrationData>(
       key: K,
       value: RegistrationData[K],
     ) => {
-      setData((d) => ({ ...d, [key]: value }));
-      setErrors((e) => ({ ...e, [key]: undefined }));
+      setData((d) => {
+        const next = { ...d, [key]: value };
+        // Re-validate touched fields in realtime so the user sees feedback as they type
+        if (touched[key] || submitAttempted) {
+          setErrors((e) => ({ ...e, [key]: validateField(key, value, next) }));
+        } else {
+          setErrors((e) => ({ ...e, [key]: undefined }));
+        }
+        return next;
+      });
+    };
+
+    const handleBlur = <K extends keyof RegistrationData>(key: K) => {
+      setTouched((t) => ({ ...t, [key]: true }));
+      setErrors((e) => ({ ...e, [key]: validateField(key, data[key]) }));
     };
 
     const validate = (): boolean => {
       const next: Errors = {};
-      if (!data.fullName.trim()) next.fullName = 'กรุณากรอกชื่อ-นามสกุล';
-      if (!data.phone.trim()) next.phone = 'กรุณากรอกเบอร์โทร';
-      else if (!/^[0-9\-+\s()]{8,}$/.test(data.phone))
-        next.phone = 'รูปแบบเบอร์โทรไม่ถูกต้อง';
-      if (!data.email.trim()) next.email = 'กรุณากรอกอีเมล';
-      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email))
-        next.email = 'รูปแบบอีเมลไม่ถูกต้อง';
-      if (!data.courseId) next.courseId = 'กรุณาเลือกคอร์ส';
-      if (!data.batchId) next.batchId = 'กรุณาเลือกรอบเรียน';
+      (Object.keys(data) as (keyof RegistrationData)[]).forEach((k) => {
+        const err = validateField(k, data[k]);
+        if (err) next[k] = err;
+      });
       setErrors(next);
       return Object.keys(next).length === 0;
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
+      setSubmitAttempted(true);
       if (!validate()) return;
       setSubmitting(true);
       setSubmitError(null);
@@ -89,6 +131,8 @@ const RegistrationForm = forwardRef<HTMLElement, Props>(
         onSuccess(data);
         setData(initialData);
         setErrors({});
+        setTouched({});
+        setSubmitAttempted(false);
       } catch (err) {
         if (err instanceof ApiError && err.fieldErrors) {
           const mapped: Errors = {};
@@ -140,6 +184,7 @@ const RegistrationForm = forwardRef<HTMLElement, Props>(
                   placeholder="สมชาย ใจดี"
                   value={data.fullName}
                   onChange={(e) => update('fullName', e.target.value)}
+                  onBlur={() => handleBlur('fullName')}
                 />
               </FormField>
 
@@ -149,6 +194,7 @@ const RegistrationForm = forwardRef<HTMLElement, Props>(
                   placeholder="08X-XXX-XXXX"
                   value={data.phone}
                   onChange={(e) => update('phone', e.target.value)}
+                  onBlur={() => handleBlur('phone')}
                 />
               </FormField>
 
@@ -158,6 +204,7 @@ const RegistrationForm = forwardRef<HTMLElement, Props>(
                   placeholder="you@email.com"
                   value={data.email}
                   onChange={(e) => update('email', e.target.value)}
+                  onBlur={() => handleBlur('email')}
                 />
               </FormField>
 
