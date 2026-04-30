@@ -1,4 +1,5 @@
 import type {
+  AuthUser,
   Registration,
   RegistrationInput,
   RegistrationStatus,
@@ -32,8 +33,40 @@ async function parse<T>(res: Response): Promise<T> {
   return body as T;
 }
 
+const credOpts: RequestInit = { credentials: 'include' };
+
+// ---------- Auth ----------
+
+export async function login(
+  username: string,
+  password: string,
+): Promise<AuthUser> {
+  const res = await fetch('/api/auth/login', {
+    ...credOpts,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password }),
+  });
+  const body = await parse<{ ok: true; user: AuthUser }>(res);
+  return body.user;
+}
+
+export async function logout(): Promise<void> {
+  await fetch('/api/auth/logout', { ...credOpts, method: 'POST' });
+}
+
+export async function me(): Promise<AuthUser | null> {
+  const res = await fetch('/api/auth/me', credOpts);
+  if (res.status === 401) return null;
+  if (!res.ok) throw new ApiError(`HTTP ${res.status}`, res.status);
+  const body = (await res.json()) as { user: AuthUser };
+  return body.user;
+}
+
+// ---------- Registrations ----------
+
 export async function getRegistrations(): Promise<Registration[]> {
-  return parse<Registration[]>(await fetch('/api/registrations'));
+  return parse<Registration[]>(await fetch('/api/registrations', credOpts));
 }
 
 export async function createRegistration(
@@ -41,6 +74,7 @@ export async function createRegistration(
 ): Promise<Registration> {
   return parse<Registration>(
     await fetch('/api/registrations', {
+      ...credOpts,
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -54,6 +88,7 @@ export async function updateRegistrationStatus(
 ): Promise<Registration> {
   return parse<Registration>(
     await fetch(`/api/registrations/${encodeURIComponent(id)}/status`, {
+      ...credOpts,
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status }),
@@ -66,6 +101,7 @@ export async function deleteRegistration(
 ): Promise<{ ok: boolean }> {
   return parse<{ ok: boolean }>(
     await fetch(`/api/registrations/${encodeURIComponent(id)}`, {
+      ...credOpts,
       method: 'DELETE',
     }),
   );

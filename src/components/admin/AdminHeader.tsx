@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useAuth } from '../../hooks/useAuth';
 
 type Props = {
   total: number;
@@ -14,18 +15,32 @@ export default function AdminHeader({
   onRefresh,
   onExport,
 }: Props) {
+  const { user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    if (!confirm('ออกจากระบบ?')) return;
+    await logout();
+  };
+
   return (
     <header className="border-b-3 border-ink bg-ink text-cream">
       <div className="container-narrow section-padding py-6">
         <div className="flex flex-wrap items-start gap-6 justify-between">
           <div className="flex-1 min-w-[260px]">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
               <Link
                 to="/"
                 className="font-mono text-[11px] uppercase tracking-[0.25em] text-cream/60 hover:text-cream transition-colors"
               >
                 ← Back to site
               </Link>
+              {user && (
+                <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-cream/60">
+                  · signed in as{' '}
+                  <span className="text-cream font-bold">{user.username}</span>{' '}
+                  <span className="text-sun">[{user.role}]</span>
+                </span>
+              )}
             </div>
             <motion.h1
               initial={{ opacity: 0, y: 8 }}
@@ -61,6 +76,12 @@ export default function AdminHeader({
               className="inline-flex items-center gap-2 px-5 py-3 bg-cream text-ink border-3 border-cream font-bold uppercase text-sm tracking-tight hover:bg-sun hover:border-sun transition-colors"
             >
               ↓ Export CSV
+            </button>
+            <button
+              onClick={handleLogout}
+              className="inline-flex items-center gap-2 px-5 py-3 border-3 border-signal text-signal font-bold uppercase text-sm tracking-tight hover:bg-signal hover:text-cream transition-colors"
+            >
+              ↩ Logout
             </button>
           </div>
         </div>

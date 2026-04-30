@@ -211,16 +211,22 @@ function SecurityNotice() {
     <motion.div
       initial={{ opacity: 0, y: -6 }}
       animate={{ opacity: 1, y: 0 }}
-      className="border-3 border-signal bg-signal/10 px-4 py-3 flex items-start gap-3"
+      className="border-3 border-ink bg-paper px-4 py-3 flex items-start gap-3"
     >
-      <span className="font-display text-xl text-signal leading-none mt-0.5">
-        ⚠
+      <span className="font-display text-xl text-ink leading-none mt-0.5">
+        ⚐
       </span>
       <p className="text-sm font-medium leading-snug">
-        <span className="font-bold uppercase tracking-wider text-signal mr-1.5">
-          หมายเหตุ:
+        <span className="font-bold uppercase tracking-wider text-ink mr-1.5">
+          Security:
         </span>
-        หน้านี้ควรเพิ่มระบบ Login และ Role-based access control ก่อนใช้งานจริง
+        เปิดใช้ Login + Role-based access control แล้ว ·
+        <span className="text-signal font-bold mx-1">เปลี่ยน password เริ่มต้น</span>
+        และตั้งค่า{' '}
+        <code className="font-mono bg-cream px-1.5 py-0.5 border border-ink/20">
+          SESSION_SECRET
+        </code>{' '}
+        ที่แข็งแรงก่อน production
       </p>
     </motion.div>
   );

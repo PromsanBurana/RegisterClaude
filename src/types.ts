@@ -1,3 +1,11 @@
+export type UserRole = 'admin' | 'viewer';
+
+export type AuthUser = {
+  id: string;
+  username: string;
+  role: UserRole;
+};
+
 export type RegistrationStatus =
   | 'new'
   | 'contacted'
