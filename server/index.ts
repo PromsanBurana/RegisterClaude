@@ -4,10 +4,14 @@ import cors from 'cors';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  insertRegistration,
-  listRegistrations,
-  countRegistrations,
-} from './db.js';
+  STORE_PATH,
+  listAll,
+  create,
+  updateStatus,
+  remove,
+  type RegistrationStatus,
+} from './store.js';
+import { findCourse, findBatch, batchDisplayName } from './courses.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -15,27 +19,45 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '64kb' }));
 
-const COURSE_BATCHES: Record<string, string[]> = {
-  'vibe-coding': ['vibe-2', 'vibe-3'],
-  'cowork-automation': ['cowork-1', 'cowork-2'],
-};
-
 const PHONE_RE = /^[0-9\-+\s()]{8,}$/;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const ALLOWED_STATUSES: ReadonlyArray<RegistrationStatus> = [
+  'new',
+  'contacted',
+  'confirmed',
+  'cancelled',
+] as const;
 
 function trim(v: unknown, max: number): string {
   return typeof v === 'string' ? v.trim().slice(0, max) : '';
 }
 
-app.get('/api/health', (_req, res) => {
+console.log(`[server] Storage: ${STORE_PATH}`);
+
+// ---------- Health ----------
+app.get('/api/health', async (_req, res) => {
+  const all = await listAll();
   res.json({
     ok: true,
     time: new Date().toISOString(),
-    registrations: countRegistrations(),
+    registrations: all.length,
+    storePath: STORE_PATH,
   });
 });
 
-app.post('/api/register', (req, res) => {
+// ---------- List ----------
+app.get('/api/registrations', async (_req, res) => {
+  try {
+    const rows = await listAll();
+    res.json(rows);
+  } catch (err) {
+    console.error('[GET /api/registrations]', err);
+    res.status(500).json({ ok: false, error: 'internal_error' });
+  }
+});
+
+// ---------- Create ----------
+app.post('/api/registrations', async (req, res) => {
   try {
     const fullName = trim(req.body?.fullName, 200);
     const phone = trim(req.body?.phone, 50);
@@ -52,51 +74,71 @@ app.post('/api/register', (req, res) => {
     else if (!PHONE_RE.test(phone)) errors.phone = 'invalid';
     if (!email) errors.email = 'required';
     else if (!EMAIL_RE.test(email)) errors.email = 'invalid';
-    if (!courseId || !COURSE_BATCHES[courseId]) errors.courseId = 'invalid';
-    if (!batchId || !COURSE_BATCHES[courseId]?.includes(batchId))
-      errors.batchId = 'invalid';
+
+    const course = findCourse(courseId);
+    if (!course) errors.courseId = 'invalid';
+    const batch = findBatch(courseId, batchId);
+    if (!batch) errors.batchId = 'invalid';
 
     if (Object.keys(errors).length > 0) {
       return res.status(400).json({ ok: false, errors });
     }
 
-    const row = insertRegistration({
+    const reg = await create({
       fullName,
       phone,
       email,
       company,
       position,
       courseId,
+      courseName: course!.title,
       batchId,
+      batchName: batchDisplayName(courseId, batchId)!,
       expectation,
     });
 
-    res.status(201).json({
-      ok: true,
-      id: row.id,
-      createdAt: row.created_at,
-    });
+    res.status(201).json(reg);
   } catch (err) {
-    console.error('[register] Error:', err);
+    console.error('[POST /api/registrations]', err);
     res.status(500).json({ ok: false, error: 'internal_error' });
   }
 });
 
-app.get('/api/registrations', (req, res) => {
+// ---------- Update status ----------
+app.patch('/api/registrations/:id/status', async (req, res) => {
   try {
-    const adminToken = process.env.ADMIN_TOKEN;
-    if (!adminToken || req.header('x-admin-token') !== adminToken) {
-      return res.status(401).json({ ok: false, error: 'unauthorized' });
+    const id = trim(req.params.id, 100);
+    const status = trim(req.body?.status, 20) as RegistrationStatus;
+    if (!ALLOWED_STATUSES.includes(status)) {
+      return res.status(400).json({ ok: false, error: 'invalid_status' });
     }
-    const rows = listRegistrations();
-    res.json({ ok: true, count: rows.length, rows });
+    const updated = await updateStatus(id, status);
+    if (!updated) {
+      return res.status(404).json({ ok: false, error: 'not_found' });
+    }
+    res.json(updated);
   } catch (err) {
-    console.error('[list] Error:', err);
+    console.error('[PATCH /api/registrations/:id/status]', err);
     res.status(500).json({ ok: false, error: 'internal_error' });
   }
 });
 
-// Serve built frontend in production
+// ---------- Delete ----------
+app.delete('/api/registrations/:id', async (req, res) => {
+  try {
+    const id = trim(req.params.id, 100);
+    const ok = await remove(id);
+    if (!ok) {
+      return res.status(404).json({ ok: false, error: 'not_found' });
+    }
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('[DELETE /api/registrations/:id]', err);
+    res.status(500).json({ ok: false, error: 'internal_error' });
+  }
+});
+
+// ---------- Static frontend (production) ----------
 if (process.env.NODE_ENV !== 'development') {
   const distPath = path.resolve(__dirname, '..', 'dist');
   app.use(express.static(distPath));
@@ -106,15 +148,13 @@ if (process.env.NODE_ENV !== 'development') {
   });
 }
 
-// Error handler
+// ---------- Error handler ----------
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error('[unhandled]', err);
   res.status(500).json({ ok: false, error: 'internal_error' });
 });
 
 const PORT = Number(process.env.PORT) || 3000;
-const HOST = '0.0.0.0';
-
-app.listen(PORT, HOST, () => {
-  console.log(`[server] Listening on http://${HOST}:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`[server] Listening on http://0.0.0.0:${PORT}`);
 });

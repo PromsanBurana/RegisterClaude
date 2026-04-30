@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, forwardRef } from 'react';
 import { motion } from 'framer-motion';
 import { courses, findCourseById } from '../data/courses';
 import { SectionHeader } from './Courses';
+import { createRegistration, ApiError } from '../api';
 
 export type RegistrationData = {
   fullName: string;
@@ -79,32 +80,21 @@ const RegistrationForm = forwardRef<HTMLElement, Props>(
       setSubmitting(true);
       setSubmitError(null);
       try {
-        const res = await fetch('/api/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data),
-        });
-        const json = await res.json().catch(() => ({}));
-
-        if (!res.ok || !json.ok) {
-          if (json?.errors) {
-            const mapped: Errors = {};
-            for (const k of Object.keys(json.errors) as (keyof RegistrationData)[]) {
-              mapped[k] = 'ข้อมูลไม่ถูกต้อง';
-            }
-            setErrors(mapped);
-          } else {
-            setSubmitError('ส่งใบสมัครไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
-          }
-          return;
-        }
-
+        await createRegistration(data);
         onSuccess(data);
         setData(initialData);
         setErrors({});
       } catch (err) {
-        console.error(err);
-        setSubmitError('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ กรุณาลองใหม่');
+        if (err instanceof ApiError && err.fieldErrors) {
+          const mapped: Errors = {};
+          for (const k of Object.keys(err.fieldErrors) as (keyof RegistrationData)[]) {
+            mapped[k] = 'ข้อมูลไม่ถูกต้อง';
+          }
+          setErrors(mapped);
+        } else {
+          console.error(err);
+          setSubmitError('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ กรุณาลองใหม่');
+        }
       } finally {
         setSubmitting(false);
       }

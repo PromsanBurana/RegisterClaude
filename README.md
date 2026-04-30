@@ -1,33 +1,20 @@
-# Claude Workshop — Landing Page & Course Registration
+# Claude Workshop — Landing Page + Admin Dashboard
 
-เว็บไซต์ Landing Page + ระบบลงทะเบียนคอร์สสำหรับ:
-
-1. **Vibe Coding (เขียนโค้ดด้วยความรู้สึก)** by Claude Code
-2. **ระบบงานอัตโนมัติ ด้วย Claude Cowork**
-
-ดีไซน์แนว Modern editorial / brutalist (TBWA-inspired) โทนครีม-ดำ-แอ็กเซนต์เหลือง
-ภาษาไทยทั้งหมด รองรับ Desktop / Tablet / Mobile
+เว็บไซต์ลงทะเบียนคอร์ส **Vibe Coding** และ **ระบบงานอัตโนมัติด้วย Claude Cowork**
+พร้อม **Admin Dashboard** สำหรับดูข้อมูลผู้สมัคร เก็บใน **Railway Volume**
 
 ---
 
 ## เทคสแตก
 
-**Frontend**
-- React 18 + TypeScript
-- Vite
-- Tailwind CSS
-- Framer Motion
-- ฟอนต์: Archivo Black + IBM Plex Sans Thai + JetBrains Mono
+| Layer | Tech |
+|---|---|
+| Frontend | React 18 + TypeScript + Vite + Tailwind + Framer Motion + React Router |
+| Backend | Express + TypeScript (run via tsx) |
+| Storage | JSON file บน Railway Volume — atomic write + mutex |
+| Hosting | Railway (single service, Nixpacks) |
 
-**Backend**
-- Express + TypeScript (รันด้วย tsx)
-- **SQLite (better-sqlite3)** — ฐานข้อมูลไฟล์เดียว
-- ทำงานเป็น Service เดียวกับ frontend
-
-**Storage**
-- **Railway Volume** — persistent disk mount ที่ `/data`
-- ไฟล์ DB เก็บที่ `/data/registrations.db`
-- ข้อมูลคงอยู่ข้าม deploys, restarts, redeploys
+ไม่ใช้ DB engine — ข้อมูลทั้งหมดอยู่ใน `registrations.json` ไฟล์เดียว
 
 ---
 
@@ -37,29 +24,31 @@
 .
 ├── index.html
 ├── vite.config.ts          # vite + proxy /api → :3000 (dev)
-├── railway.json            # build/start config
-├── nixpacks.toml           # native build deps for better-sqlite3
+├── railway.json + nixpacks.toml
 ├── .env.example
 ├── tsconfig.{app,server,node}.json
 ├── server/
-│   ├── index.ts            # Express app + API endpoints
-│   └── db.ts               # SQLite + auto-create schema
-├── data/                   # local dev DB (gitignored)
-│   └── registrations.db
+│   ├── index.ts            # Express + 4 endpoints
+│   ├── store.ts            # JSON file: read/create/updateStatus/remove + mutex
+│   └── courses.ts          # course/batch whitelist + display name
 └── src/
-    ├── App.tsx
-    ├── data/courses.ts     # ข้อมูลคอร์ส (แก้ที่นี่)
+    ├── App.tsx             # router (BrowserRouter + Routes)
+    ├── types.ts            # Registration / RegistrationStatus
+    ├── api.ts              # getRegistrations / createRegistration / updateRegistrationStatus / deleteRegistration
+    ├── data/courses.ts     # ข้อมูลคอร์ส (ใช้ใน frontend)
+    ├── pages/
+    │   ├── Landing.tsx     # / — landing page
+    │   └── Admin.tsx       # /admin — dashboard
     └── components/
-        ├── Navbar.tsx
-        ├── Hero.tsx
-        ├── Marquee.tsx
-        ├── Courses.tsx
-        ├── ExampleWork.tsx
-        ├── WhyJoin.tsx
-        ├── RegistrationForm.tsx   # POST /api/register
-        ├── FAQ.tsx
-        ├── Footer.tsx
-        └── SuccessModal.tsx
+        ├── (landing)       # Navbar, Hero, Courses, ExampleWork, WhyJoin, RegistrationForm, FAQ, Footer, SuccessModal
+        └── admin/
+            ├── AdminHeader.tsx
+            ├── StatsCards.tsx
+            ├── Filters.tsx
+            ├── RegistrationsTable.tsx
+            ├── DetailModal.tsx
+            ├── ConfirmDialog.tsx
+            └── StatusBadge.tsx
 ```
 
 ---
@@ -70,106 +59,80 @@
 
 ```bash
 npm install
-```
-
-### 2. ตั้งค่า env
-
-```bash
 cp .env.example .env
 ```
 
-ใน local ปล่อย `DATA_DIR` ว่างก็ได้ — ระบบจะใช้ `./data/` อัตโนมัติ
+ใน local ปล่อย `REGISTRATION_DATA_PATH` ว่างก็ได้ — fallback จะใช้ `./data/registrations.json`
 
-### 3. รัน frontend + backend พร้อมกัน
+### 2. รัน frontend + backend พร้อมกัน
 
 ```bash
 npm run dev
 ```
 
-- Frontend: http://localhost:5173 (Vite)
-- Backend:  http://localhost:3000 (Express + SQLite)
-- Vite proxy `/api/*` → backend อัตโนมัติ
+- Frontend: http://localhost:5173
+- Backend:  http://localhost:3000
+- Vite proxy `/api/*` → backend
+- เปิด http://localhost:5173/admin เพื่อใช้ dashboard
 
-> รันแยกกันได้ด้วย `npm run dev:web` กับ `npm run dev:api`
+> รันแยกกันได้ด้วย `npm run dev:web` และ `npm run dev:api`
 
-### 4. Build + start production แบบ local
+### 3. Production build แบบ local
 
 ```bash
 npm run build
 npm start
 ```
 
-Express จะ serve `dist/` + API ในพอร์ตเดียวกัน (default 3000)
+Express จะ serve `dist/` + API ในพอร์ตเดียวกัน
 
 ---
 
-## Deploy ขึ้น Railway (ใช้ Volume)
+## Deploy ขึ้น Railway
 
-### ขั้นที่ 1: สร้างโปรเจกต์
+### ขั้นที่ 1: สร้างโปรเจกต์ + เปิด volume
 
-1. เข้า [railway.com](https://railway.com) → **New Project**
-2. **Deploy from GitHub repo** → เลือก `RegisterClaude`
-3. รอ build ครั้งแรกเสร็จ (Nixpacks จะ install Python + gcc เพื่อ compile better-sqlite3)
+1. [Railway](https://railway.com) → **New Project** → **Deploy from GitHub** → เลือก repo
+2. รอ build ครั้งแรกจบ
+3. ที่ service → **Settings** → **Volumes** → **+ New Volume**
+   - **Mount Path**: `/data`
+   - **Size**: 1 GB
 
-### ขั้นที่ 2: เพิ่ม Volume
+### ขั้นที่ 2: ตั้ง environment variables
 
-ใน service ที่เพิ่ง deploy ไปที่:
-
-1. **Settings** → **Volumes** → **+ New Volume**
-2. **Mount Path**: `/data`
-3. **Size**: 1 GB ก็พอ (ขยายภายหลังได้)
-4. **Attach** เข้ากับ service
-
-### ขั้นที่ 3: ตั้ง env vars
-
-ที่ tab **Variables** เพิ่ม:
+Settings → **Variables**:
 
 | Key | Value |
 |---|---|
-| `DATA_DIR` | `/data` |
-| `ADMIN_TOKEN` | สุ่มยาว ๆ เช่น `openssl rand -hex 32` |
+| `REGISTRATION_DATA_PATH` | `/data/registrations.json` |
 | `NODE_ENV` | `production` |
 
-> `PORT` Railway ใส่ให้เอง
+> `PORT` Railway ตั้งให้เอง
 
-### ขั้นที่ 4: Generate domain
+### ขั้นที่ 3: Generate domain
 
-**Settings** → **Networking** → **Generate Domain** → ได้ URL เช่น
-`claude-workshop-production.up.railway.app`
+Settings → **Networking** → **Generate Domain** → ได้ URL เช่น
+`claude-register-production.up.railway.app`
 
-ครั้งแรกที่ deploy server จะสร้างไฟล์ `/data/registrations.db` พร้อมตาราง `registrations` ให้อัตโนมัติ
+ครั้งแรกที่ deploy server จะสร้าง `/data/registrations.json` ให้อัตโนมัติเป็น `[]`
 
-### ขั้นที่ 5: ทดสอบ
+### ขั้นที่ 4: ทดสอบ
 
-```bash
-# health check (ควรขึ้นจำนวน registrations)
-curl https://YOUR-APP.up.railway.app/api/health
-
-# ส่งใบสมัครจริงผ่านเว็บ จากนั้น:
-curl https://YOUR-APP.up.railway.app/api/registrations \
-  -H "x-admin-token: YOUR_ADMIN_TOKEN"
-```
-
----
-
-## ทำไมใช้ Volume + SQLite
-
-| | SQLite + Volume | PostgreSQL plugin |
-|---|---|---|
-| Setup | 1 service | 2 services |
-| Cost | $0 plugin (volume only) | $5/mo plugin |
-| Latency | in-process (<1ms) | network round-trip |
-| Backup | snapshot volume / curl `/api/registrations` | built-in |
-| Scale | 1 service เท่านั้น | scale ได้ |
-
-เหมาะกับ workshop registration ที่ traffic ไม่สูง อยากเก็บข้อมูลถาวรแบบประหยัด
+- Landing: `https://YOUR-APP.up.railway.app/`
+- Admin: `https://YOUR-APP.up.railway.app/admin`
+- Health: `https://YOUR-APP.up.railway.app/api/health`
 
 ---
 
 ## API Endpoints
 
-### `POST /api/register`
+ทั้งหมด JSON, ไม่มี auth (เปิด public ตอนนี้ — ดูส่วน Security ด้านล่าง)
 
+### `GET /api/registrations`
+อ่านทุก registration จากไฟล์ → `Registration[]`
+
+### `POST /api/registrations`
+สร้างใหม่ — body:
 ```json
 {
   "fullName": "สมชาย ใจดี",
@@ -182,60 +145,77 @@ curl https://YOUR-APP.up.railway.app/api/registrations \
   "expectation": "..."
 }
 ```
+Server เพิ่ม `id` (UUID), `createdAt`, `status: "new"`, `courseName`, `batchName`
+→ `201 Registration` หรือ `400 { ok: false, errors: { email: "invalid" } }`
 
-→ `201 { ok: true, id, createdAt }`
-→ `400 { ok: false, errors: { email: "invalid", ... } }`
+### `PATCH /api/registrations/:id/status`
+body: `{ "status": "new" | "contacted" | "confirmed" | "cancelled" }`
+→ `200 Registration` / `400 invalid_status` / `404 not_found`
 
-### `GET /api/registrations` (admin)
-
-Header: `x-admin-token: <ADMIN_TOKEN>`
-→ คืน 500 records ล่าสุด
+### `DELETE /api/registrations/:id`
+→ `200 { ok: true }` / `404 not_found`
 
 ### `GET /api/health`
-
-→ `{ ok: true, time, registrations: <count> }`
-
----
-
-## Database schema
-
-```sql
-CREATE TABLE registrations (
-  id          INTEGER PRIMARY KEY AUTOINCREMENT,
-  full_name   TEXT NOT NULL,
-  phone       TEXT NOT NULL,
-  email       TEXT NOT NULL,
-  company     TEXT,
-  position    TEXT,
-  course_id   TEXT NOT NULL,
-  batch_id    TEXT NOT NULL,
-  expectation TEXT,
-  created_at  TEXT NOT NULL DEFAULT (datetime('now'))
-);
-```
-
-`server/db.ts` รัน `CREATE TABLE IF NOT EXISTS` ตอนบูตเสมอ — ปลอดภัยกับการ deploy ซ้ำ
+→ `{ ok: true, time, registrations, storePath }`
 
 ---
 
-## ดู / backup ข้อมูล
+## Storage details
 
-**ผ่าน API:**
+### File handling
+- ถ้า directory ไม่มี → สร้างให้
+- ถ้าไฟล์ไม่มี → สร้างเป็น `[]`
+- เขียนแบบ atomic: เขียน `.tmp` แล้ว `rename` ทับ (กัน corruption ถ้า process ตายระหว่างเขียน)
+- ใช้ in-memory queue (`Promise` chain) serialize ทุก op — ไม่มี race condition
+- Pretty JSON (`JSON.stringify(rows, null, 2)`)
+
+### Corruption recovery
+ถ้าเปิดไฟล์แล้ว parse ไม่ได้:
+- backup ไฟล์เดิมเป็น `registrations.corrupt.<ISO_TIMESTAMP>.json`
+- เขียน `registrations.json` ใหม่เป็น `[]`
+- log error
+- API ยังตอบกลับได้ปกติ (เห็นเป็น array ว่าง)
+
+### Backup
 ```bash
-curl https://YOUR-APP.up.railway.app/api/registrations \
-  -H "x-admin-token: YOUR_ADMIN_TOKEN" \
-  | jq > backup-$(date +%F).json
+# ผ่าน API (ผลลัพธ์ตาม filter ปัจจุบัน — กดปุ่ม Export CSV ใน /admin)
+curl https://YOUR-APP.up.railway.app/api/registrations > backup-$(date +%F).json
+
+# ผ่าน Railway shell ถ้าเปิดได้
+cat /data/registrations.json
 ```
 
-**ผ่าน Railway shell** (ถ้ามี):
-```bash
-sqlite3 /data/registrations.db "SELECT * FROM registrations;"
-```
+---
+
+## Admin Dashboard (`/admin`)
+
+- 5 stat cards: total / vibe / cowork / today / top batch
+- ค้นหาจาก ชื่อ / เบอร์ / อีเมล / บริษัท
+- Filter ตามคอร์ส, รุ่น, สถานะ + ปุ่ม Clear
+- Table รวม view detail modal, change status dropdown, delete (พร้อม confirm)
+- Export CSV (ตาม filter, UTF-8 BOM รองรับ Excel ภาษาไทย)
+- Loading / error / empty / no-match states ครบ
+- ปุ่ม Refresh ดึงข้อมูลใหม่จาก `GET /api/registrations`
+
+---
+
+## Security Notice
+
+หน้า `/admin` เปิด public ตอนนี้ — **ห้ามใช้กับข้อมูลจริงโดยไม่เพิ่ม auth ก่อน**
+
+แนะนำให้เพิ่มก่อนใช้งานจริง:
+- HTTP Basic Auth middleware ที่ Express
+- หรือ JWT + Login page
+- หรือ Cloudflare Access / Railway Edge IP allowlist
+- Role-based access control (admin / viewer)
+
+ในหน้าจอ admin มี banner แจ้งเรื่องนี้ไว้แล้ว
 
 ---
 
 ## การแก้ไขข้อมูลคอร์ส
 
-แก้ที่ `src/data/courses.ts` ที่เดียว — frontend จะอัปเดตตาม
-ถ้าเพิ่มคอร์สใหม่ อย่าลืมเพิ่ม mapping ใน `server/index.ts` ตัวแปร `COURSE_BATCHES` ด้วย
-(server validate batch กับ course เพื่อกัน input ที่ไม่ตรงกัน)
+1. แก้ที่ `src/data/courses.ts` (frontend)
+2. แก้ที่ `server/courses.ts` (backend whitelist + display name)
+
+ทั้ง 2 ไฟล์ต้องสอดคล้องกัน — server validate `courseId`/`batchId` ก่อน insert
