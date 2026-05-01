@@ -3,8 +3,10 @@ import { motion } from 'framer-motion';
 import {
   deleteRegistration,
   getRegistrations,
+  moveRegistration,
   updateRegistrationStatus,
 } from '../api';
+import { useBatchAvailability } from '../hooks/useBatchAvailability';
 import type { Registration, RegistrationStatus } from '../types';
 import { courses } from '../data/courses';
 import Container from '../components/ui/Container';
@@ -29,6 +31,8 @@ export default function Admin() {
 
   const [detailReg, setDetailReg] = useState<Registration | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Registration | null>(null);
+
+  const availability = useBatchAvailability();
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -75,6 +79,28 @@ export default function Admin() {
       setData((rows) => rows.map((r) => (r.id === id ? updated : r)));
     } catch (err) {
       alert('อัปเดตสถานะไม่สำเร็จ: ' + (err as Error).message);
+    } finally {
+      setPendingId(null);
+    }
+  };
+
+  const handleMoveBatch = async (
+    id: string,
+    courseId: string,
+    batchId: string,
+  ) => {
+    setPendingId(id);
+    try {
+      const updated = await moveRegistration(id, courseId, batchId);
+      setData((rows) => rows.map((r) => (r.id === id ? updated : r)));
+      setDetailReg(updated);
+      void availability.refresh();
+    } catch (err) {
+      const msg = (err as Error).message || '';
+      if (msg === 'target_batch_full') {
+        throw new Error('รุ่นปลายทางเต็มแล้ว');
+      }
+      throw err;
     } finally {
       setPendingId(null);
     }
@@ -179,6 +205,8 @@ export default function Admin() {
       <DetailPanel
         registration={detailReg}
         onClose={() => setDetailReg(null)}
+        availability={availability}
+        onMove={handleMoveBatch}
       />
       <ConfirmDialog
         open={!!confirmDelete}

@@ -103,6 +103,21 @@ export async function updateRegistrationStatus(
   );
 }
 
+export async function moveRegistration(
+  id: string,
+  courseId: string,
+  batchId: string,
+): Promise<Registration> {
+  return parse<Registration>(
+    await fetch(`/api/registrations/${encodeURIComponent(id)}/batch`, {
+      ...credOpts,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ courseId, batchId }),
+    }),
+  );
+}
+
 export async function deleteRegistration(
   id: string,
 ): Promise<{ ok: boolean }> {

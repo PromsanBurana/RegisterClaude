@@ -1,10 +1,24 @@
+import { useEffect, useMemo, useState } from 'react';
 import type { Registration } from '../../types';
 import StatusBadge from './StatusBadge';
 import SidePanel from '../ui/SidePanel';
+import Button from '../ui/Button';
+import { Select } from '../ui/Input';
+import { courses } from '../../data/courses';
+import {
+  describeAvailability,
+  type AvailabilityHelper,
+} from '../../hooks/useBatchAvailability';
 
 type Props = {
   registration: Registration | null;
   onClose: () => void;
+  availability: AvailabilityHelper;
+  onMove: (
+    id: string,
+    courseId: string,
+    batchId: string,
+  ) => Promise<void>;
 };
 
 function formatDate(iso: string) {
@@ -16,7 +30,12 @@ function formatDate(iso: string) {
   });
 }
 
-export default function DetailPanel({ registration, onClose }: Props) {
+export default function DetailPanel({
+  registration,
+  onClose,
+  availability,
+  onMove,
+}: Props) {
   return (
     <SidePanel
       open={!!registration}
@@ -60,6 +79,12 @@ export default function DetailPanel({ registration, onClose }: Props) {
             </div>
           </div>
 
+          <MoveBatchPanel
+            registration={registration}
+            availability={availability}
+            onMove={onMove}
+          />
+
           <div className="border-t border-line pt-5">
             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-fg-muted">
               ความคาดหวัง
@@ -79,6 +104,135 @@ export default function DetailPanel({ registration, onClose }: Props) {
         </div>
       )}
     </SidePanel>
+  );
+}
+
+// -----------------------------------------------------------------------------
+// Move batch
+// -----------------------------------------------------------------------------
+
+type Option = {
+  courseId: string;
+  batchId: string;
+  optionLabel: string;
+  isFull: boolean;
+  isCurrent: boolean;
+  helper: string;
+};
+
+function MoveBatchPanel({
+  registration,
+  availability,
+  onMove,
+}: {
+  registration: Registration;
+  availability: AvailabilityHelper;
+  onMove: Props['onMove'];
+}) {
+  const options = useMemo<Option[]>(() => {
+    const list: Option[] = [];
+    for (const c of courses) {
+      for (const b of c.batches) {
+        const avail = availability.lookup(c.id, b.id);
+        const desc = describeAvailability(avail);
+        const isCurrent =
+          registration.courseId === c.id && registration.batchId === b.id;
+        list.push({
+          courseId: c.id,
+          batchId: b.id,
+          optionLabel: `${c.shortTitle} • ${b.label} • ${b.date}${
+            isCurrent ? ' (รุ่นปัจจุบัน)' : ''
+          }`,
+          isFull: !!avail?.isFull,
+          isCurrent,
+          helper: desc.label,
+        });
+      }
+    }
+    return list;
+  }, [availability, registration]);
+
+  const [target, setTarget] = useState<string>('');
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Reset selection whenever the open registration changes
+  useEffect(() => {
+    setTarget('');
+    setError(null);
+  }, [registration.id]);
+
+  const targetOption = options.find(
+    (o) => `${o.courseId}::${o.batchId}` === target,
+  );
+  const canMove = !!target && !targetOption?.isCurrent && !targetOption?.isFull;
+
+  const handleMove = async () => {
+    if (!targetOption) return;
+    if (
+      !confirm(
+        `ย้ายผู้สมัคร "${registration.fullName}"\nจาก: ${registration.batchName}\nไปยัง: ${targetOption.optionLabel}\n\nยืนยัน?`,
+      )
+    ) {
+      return;
+    }
+    setSubmitting(true);
+    setError(null);
+    try {
+      await onMove(registration.id, targetOption.courseId, targetOption.batchId);
+      setTarget('');
+    } catch (err) {
+      setError((err as Error).message || 'ย้ายไม่สำเร็จ');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="border-t border-line pt-5">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-fg-muted">
+        Move to another batch
+      </p>
+      <div className="mt-3 rounded-xl border border-line bg-elevated p-4 space-y-3">
+        <Select
+          value={target}
+          onChange={(e) => setTarget(e.target.value)}
+          disabled={submitting}
+        >
+          <option value="">— เลือกรุ่นใหม่ —</option>
+          {options.map((o) => {
+            const key = `${o.courseId}::${o.batchId}`;
+            const suffix = o.isFull ? ' — เต็ม' : o.helper ? ` — ${o.helper}` : '';
+            return (
+              <option
+                key={key}
+                value={key}
+                disabled={o.isFull || o.isCurrent}
+              >
+                {o.optionLabel}
+                {suffix}
+              </option>
+            );
+          })}
+        </Select>
+
+        {error && (
+          <p className="text-xs font-medium text-status-red">↳ {error}</p>
+        )}
+
+        <div className="flex justify-end">
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={handleMove}
+            disabled={!canMove || submitting}
+          >
+            {submitting ? 'กำลังย้าย...' : 'ย้ายรุ่น'}
+            {!submitting && <span aria-hidden>→</span>}
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }
 

@@ -9,6 +9,7 @@ import {
   listAll,
   create,
   updateStatus,
+  updateBatch,
   remove,
   type RegistrationStatus,
 } from './store.js';
@@ -218,6 +219,72 @@ app.get(
       res.json(rows);
     } catch (err) {
       console.error('[GET /api/registrations]', err);
+      res.status(500).json({ ok: false, error: 'internal_error' });
+    }
+  },
+);
+
+app.patch(
+  '/api/registrations/:id/batch',
+  requireAuth,
+  requireRole('admin'),
+  async (req, res) => {
+    try {
+      const id = trim(req.params.id, 100);
+      const newCourseId = trim(req.body?.courseId, 60);
+      const newBatchId = trim(req.body?.batchId, 60);
+
+      const course = findCourse(newCourseId);
+      if (!course) {
+        return res.status(400).json({ ok: false, error: 'invalid_course' });
+      }
+      const batch = findBatch(newCourseId, newBatchId);
+      if (!batch) {
+        return res.status(400).json({ ok: false, error: 'invalid_batch' });
+      }
+
+      const all = await listAll();
+      const reg = all.find((r) => r.id === id);
+      if (!reg) {
+        return res.status(404).json({ ok: false, error: 'not_found' });
+      }
+
+      // No-op if already in the target batch
+      if (reg.courseId === newCourseId && reg.batchId === newBatchId) {
+        return res.json(reg);
+      }
+
+      // Capacity guard on the destination — exclude this registration in case
+      // it's already counted there (defensive; the no-op above already handles
+      // the same-batch case).
+      const counts = await getBatchCounts();
+      let targetCount = counts.get(`${newCourseId}::${newBatchId}`) || 0;
+      if (
+        reg.courseId === newCourseId &&
+        reg.batchId === newBatchId &&
+        reg.status !== 'cancelled'
+      ) {
+        targetCount -= 1;
+      }
+      if (targetCount >= BATCH_CAPACITY) {
+        return res.status(409).json({
+          ok: false,
+          error: 'target_batch_full',
+        });
+      }
+
+      const updated = await updateBatch(id, {
+        courseId: newCourseId,
+        courseName: course.title,
+        batchId: newBatchId,
+        batchName: batchDisplayName(newCourseId, newBatchId)!,
+      });
+      if (!updated) {
+        return res.status(404).json({ ok: false, error: 'not_found' });
+      }
+      res.json(updated);
+    } catch (err) {
+      console.error('[PATCH /api/registrations/:id/batch]', err);
       res.status(500).json({ ok: false, error: 'internal_error' });
     }
   },

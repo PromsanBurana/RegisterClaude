@@ -133,6 +133,25 @@ export function updateStatus(
   });
 }
 
+export type BatchPatch = Pick<
+  Registration,
+  'courseId' | 'courseName' | 'batchId' | 'batchName'
+>;
+
+export function updateBatch(
+  id: string,
+  patch: BatchPatch,
+): Promise<Registration | null> {
+  return enqueue(async () => {
+    const all = readSafe();
+    const idx = all.findIndex((r) => r.id === id);
+    if (idx === -1) return null;
+    all[idx] = { ...all[idx], ...patch };
+    await writeAtomic(all);
+    return all[idx];
+  });
+}
+
 export function remove(id: string): Promise<boolean> {
   return enqueue(async () => {
     const all = readSafe();
