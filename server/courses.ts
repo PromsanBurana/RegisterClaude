@@ -32,6 +32,18 @@ export const COURSES: ServerCourse[] = [
         date: 'วันพุธที่ 13 พ.ค.',
         time: '09.30 - 12.00 น.',
       },
+      {
+        id: 'vibe-4',
+        label: 'รุ่น 4',
+        date: 'วันพุธที่ 27 พ.ค.',
+        time: '09.30 - 12.00 น.',
+      },
+      {
+        id: 'vibe-5',
+        label: 'รุ่น 5',
+        date: 'วันพุธที่ 3 มิ.ย.',
+        time: '09.30 - 12.00 น.',
+      },
     ],
   },
   {
@@ -48,6 +60,18 @@ export const COURSES: ServerCourse[] = [
         id: 'cowork-2',
         label: 'รุ่น 2',
         date: 'วันพฤหัสที่ 14 พ.ค.',
+        time: '09.30 - 12.00 น.',
+      },
+      {
+        id: 'cowork-3',
+        label: 'รุ่น 3',
+        date: 'วันพฤหัสที่ 28 พ.ค.',
+        time: '09.30 - 12.00 น.',
+      },
+      {
+        id: 'cowork-4',
+        label: 'รุ่น 4',
+        date: 'วันพฤหัสที่ 4 มิ.ย.',
         time: '09.30 - 12.00 น.',
       },
     ],
