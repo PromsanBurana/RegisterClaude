@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, forwardRef } from 'react';
 import { motion } from 'framer-motion';
-import { courses, findCourseById } from '../data/courses';
+import { courses, findCourseById, isBatchPast } from '../data/courses';
 import { createRegistration, ApiError } from '../api';
 import Container from './ui/Container';
 import Section from './ui/Section';
@@ -275,25 +275,27 @@ const RegistrationForm = forwardRef<HTMLElement, Props>(
                   <option value="">
                     {selectedCourse ? '— กรุณาเลือกรอบเรียน —' : 'โปรดเลือกคอร์สก่อน'}
                   </option>
-                  {selectedCourse?.batches.map((b) => {
-                    const avail = availability.lookup(selectedCourse.id, b.id);
-                    const desc = describeAvailability(avail);
-                    const suffix = avail
-                      ? avail.isFull
-                        ? ' — ที่นั่งเต็ม'
-                        : ` — ${desc.label}`
-                      : '';
-                    return (
-                      <option
-                        key={b.id}
-                        value={b.id}
-                        disabled={!!avail?.isFull}
-                      >
-                        {b.label} • {b.date} • {b.time}
-                        {suffix}
-                      </option>
-                    );
-                  })}
+                  {selectedCourse?.batches
+                    .filter((b) => !isBatchPast(b))
+                    .map((b) => {
+                      const avail = availability.lookup(selectedCourse.id, b.id);
+                      const desc = describeAvailability(avail);
+                      const suffix = avail
+                        ? avail.isFull
+                          ? ' — ที่นั่งเต็ม'
+                          : ` — ${desc.label}`
+                        : '';
+                      return (
+                        <option
+                          key={b.id}
+                          value={b.id}
+                          disabled={!!avail?.isFull}
+                        >
+                          {b.label} • {b.date} • {b.time}
+                          {suffix}
+                        </option>
+                      );
+                    })}
                 </Select>
                 {selectedCourse && data.batchId && (
                   <BatchSeatHint

@@ -7,6 +7,8 @@ export type ServerBatch = {
   label: string;
   date: string;
   time: string;
+  /** ISO date (YYYY-MM-DD, Asia/Bangkok). Used to gate registrations. */
+  dateISO: string;
 };
 
 export type ServerCourse = {
@@ -25,24 +27,28 @@ export const COURSES: ServerCourse[] = [
         label: 'รุ่น 2',
         date: 'วันพุธที่ 6 พ.ค.',
         time: '09.30 - 12.00 น.',
+        dateISO: '2026-05-06',
       },
       {
         id: 'vibe-3',
         label: 'รุ่น 3',
         date: 'วันพุธที่ 13 พ.ค.',
         time: '09.30 - 12.00 น.',
+        dateISO: '2026-05-13',
       },
       {
         id: 'vibe-4',
         label: 'รุ่น 4',
         date: 'วันพุธที่ 27 พ.ค.',
         time: '09.30 - 12.00 น.',
+        dateISO: '2026-05-27',
       },
       {
         id: 'vibe-5',
         label: 'รุ่น 5',
         date: 'วันพุธที่ 3 มิ.ย.',
         time: '09.30 - 12.00 น.',
+        dateISO: '2026-06-03',
       },
     ],
   },
@@ -55,24 +61,28 @@ export const COURSES: ServerCourse[] = [
         label: 'รุ่น 1',
         date: 'วันพฤหัสที่ 7 พ.ค.',
         time: '09.30 - 12.00 น.',
+        dateISO: '2026-05-07',
       },
       {
         id: 'cowork-2',
         label: 'รุ่น 2',
         date: 'วันพฤหัสที่ 14 พ.ค.',
         time: '09.30 - 12.00 น.',
+        dateISO: '2026-05-14',
       },
       {
         id: 'cowork-3',
         label: 'รุ่น 3',
         date: 'วันพฤหัสที่ 28 พ.ค.',
         time: '09.30 - 12.00 น.',
+        dateISO: '2026-05-28',
       },
       {
         id: 'cowork-4',
         label: 'รุ่น 4',
         date: 'วันพฤหัสที่ 4 มิ.ย.',
         time: '09.30 - 12.00 น.',
+        dateISO: '2026-06-04',
       },
     ],
   },
@@ -89,4 +99,20 @@ export function findBatch(courseId: string, batchId: string): ServerBatch | unde
 export function batchDisplayName(courseId: string, batchId: string): string | null {
   const b = findBatch(courseId, batchId);
   return b ? `${b.label} • ${b.date} • ${b.time}` : null;
+}
+
+// -----------------------------------------------------------------------------
+// Date helpers (Asia/Bangkok)
+// -----------------------------------------------------------------------------
+
+const BKK_OFFSET_MS = 7 * 60 * 60 * 1000;
+
+/** Today's date in Asia/Bangkok as YYYY-MM-DD (independent of host TZ). */
+export function bangkokToday(now: Date = new Date()): string {
+  return new Date(now.getTime() + BKK_OFFSET_MS).toISOString().slice(0, 10);
+}
+
+/** True if the batch's class date has strictly passed (Bangkok time). */
+export function isBatchPast(b: Pick<ServerBatch, 'dateISO'>, now?: Date): boolean {
+  return b.dateISO < bangkokToday(now);
 }

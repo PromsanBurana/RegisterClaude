@@ -4,7 +4,7 @@ import StatusBadge from './StatusBadge';
 import SidePanel from '../ui/SidePanel';
 import Button from '../ui/Button';
 import { Select } from '../ui/Input';
-import { courses } from '../../data/courses';
+import { courses, isBatchPast } from '../../data/courses';
 import {
   describeAvailability,
   type AvailabilityHelper,
@@ -133,6 +133,8 @@ function MoveBatchPanel({
     const list: Option[] = [];
     for (const c of courses) {
       for (const b of c.batches) {
+        // Hide past batches from move targets — can't move someone into the past
+        if (isBatchPast(b)) continue;
         const avail = availability.lookup(c.id, b.id);
         const desc = describeAvailability(avail);
         const isCurrent =

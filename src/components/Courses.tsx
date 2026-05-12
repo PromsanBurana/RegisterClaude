@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { courses, type Course } from '../data/courses';
+import { courses, type Course, upcomingBatches } from '../data/courses';
 import Container from './ui/Container';
 import Section from './ui/Section';
 import SectionHeader from './ui/SectionHeader';
@@ -103,7 +103,14 @@ function CourseCard({
 }) {
   const accent = ACCENTS[index % ACCENTS.length];
   const lift = index === 0 ? 'lg:translate-y-0' : 'lg:translate-y-6';
-  const courseFull = availability.isCourseFull(course.id);
+  const visibleBatches = upcomingBatches(course);
+  const noUpcoming = visibleBatches.length === 0;
+  const allFull =
+    !noUpcoming &&
+    visibleBatches.every(
+      (b) => availability.lookup(course.id, b.id)?.isFull,
+    );
+  const courseFull = noUpcoming || allFull;
 
   return (
     <motion.div
@@ -180,7 +187,17 @@ function CourseCard({
                 Schedule
               </p>
               <div className="mt-4 grid sm:grid-cols-2 gap-3">
-                {course.batches.map((b) => {
+                {noUpcoming && (
+                  <div className="sm:col-span-2 rounded-xl border border-dashed border-line bg-elevated p-4 text-center">
+                    <p className="text-sm font-semibold text-fg-secondary">
+                      ยังไม่เปิดรอบเรียนใหม่
+                    </p>
+                    <p className="mt-1 text-xs text-fg-muted">
+                      ติดตามรอบใหม่ได้เร็วๆ นี้
+                    </p>
+                  </div>
+                )}
+                {visibleBatches.map((b) => {
                   const avail = availability.lookup(course.id, b.id);
                   const tone = describeAvailability(avail);
                   return (
@@ -225,7 +242,11 @@ function CourseCard({
               onClick={onSelect}
               disabled={courseFull}
             >
-              {courseFull ? 'ที่นั่งเต็มทุกรุ่น' : 'เลือกคอร์สนี้'}
+              {noUpcoming
+                ? 'ยังไม่เปิดรอบใหม่'
+                : allFull
+                  ? 'ที่นั่งเต็มทุกรุ่น'
+                  : 'เลือกคอร์สนี้'}
               {!courseFull && (
                 <motion.span
                   aria-hidden

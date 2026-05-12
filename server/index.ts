@@ -13,7 +13,13 @@ import {
   remove,
   type RegistrationStatus,
 } from './store.js';
-import { COURSES, findCourse, findBatch, batchDisplayName } from './courses.js';
+import {
+  COURSES,
+  findCourse,
+  findBatch,
+  batchDisplayName,
+  isBatchPast,
+} from './courses.js';
 import {
   attachUser,
   requireAuth,
@@ -118,6 +124,8 @@ app.get('/api/batches', async (_req, res) => {
     }> = [];
     for (const c of COURSES) {
       for (const b of c.batches) {
+        // Hide past batches from the public availability feed entirely
+        if (isBatchPast(b)) continue;
         const count = counts.get(`${c.id}::${b.id}`) || 0;
         result.push({
           courseId: c.id,
@@ -174,6 +182,15 @@ app.post('/api/registrations', async (req, res) => {
 
     if (Object.keys(errors).length > 0) {
       return res.status(400).json({ ok: false, errors });
+    }
+
+    // Reject past batches — they shouldn't be in the dropdown anyway
+    if (batch && isBatchPast(batch)) {
+      return res.status(410).json({
+        ok: false,
+        error: 'batch_past',
+        errors: { batchId: 'batch_past' },
+      });
     }
 
     // Capacity check — block if the chosen batch is already at the cap
@@ -241,6 +258,12 @@ app.patch(
       const batch = findBatch(newCourseId, newBatchId);
       if (!batch) {
         return res.status(400).json({ ok: false, error: 'invalid_batch' });
+      }
+      if (isBatchPast(batch)) {
+        return res.status(410).json({
+          ok: false,
+          error: 'target_batch_past',
+        });
       }
 
       const all = await listAll();
