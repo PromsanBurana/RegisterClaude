@@ -7,7 +7,7 @@
 nixPkgs = ["nodejs_20"]
 
 [phases.install]
-cmds = ["npm install --prefer-offline --no-audit --no-fund"]
+cmds = ["npm install --prefer-offline --no-audit --no-fund --include=dev"]
 
 [phases.build]
 cmds = ["npm run build"]
