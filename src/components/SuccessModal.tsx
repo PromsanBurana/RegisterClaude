@@ -70,6 +70,45 @@ export default function SuccessModal({ open, data, onClose }: Props) {
           </div>
         )}
 
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.55, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-4 text-left rounded-2xl border border-brand-orange/25 bg-gradient-to-br from-brand-orange/10 via-surface to-surface p-4"
+        >
+          <div className="flex items-start gap-3">
+            <span className="mt-0.5 inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-warm text-white shadow-soft flex-shrink-0">
+              <svg
+                viewBox="0 0 24 24"
+                className="h-4.5 w-4.5"
+                width="18"
+                height="18"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect x="3" y="4" width="18" height="13" rx="2" />
+                <path d="M3 17h18M9 21h6" />
+                <path d="M9 9l2 2-2 2M13 13h2" />
+              </svg>
+            </span>
+            <div className="flex-1">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-brand-orange">
+                สิ่งที่ต้องเตรียม
+              </p>
+              <p className="mt-1 text-sm font-medium text-ink leading-relaxed">
+                กรุณาติดต่อ <span className="font-bold">แผนก IT</span>{' '}
+                เพื่อติดตั้งโปรแกรม{' '}
+                <span className="font-bold text-brand-orange whitespace-nowrap">
+                  ก่อนเรียนอย่างน้อย 1 วัน
+                </span>
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
         <Button
           variant="primary"
           size="md"
