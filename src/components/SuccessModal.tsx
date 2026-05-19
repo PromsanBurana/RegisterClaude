@@ -71,18 +71,16 @@ export default function SuccessModal({ open, data, onClose }: Props) {
         )}
 
         <motion.div
-          initial={{ opacity: 0, y: 8 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.55, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-4 text-left rounded-2xl border border-brand-orange/25 bg-gradient-to-br from-brand-orange/10 via-surface to-surface p-4"
+          className="mt-6 text-left rounded-2xl border-2 border-brand-orange/30 bg-gradient-to-br from-brand-orange/15 via-surface to-surface p-5 sm:p-6 shadow-glow-orange"
         >
-          <div className="flex items-start gap-3">
-            <span className="mt-0.5 inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-warm text-white shadow-soft flex-shrink-0">
+          <div className="flex items-start gap-4">
+            <span className="mt-0.5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-warm text-white shadow-card flex-shrink-0">
               <svg
                 viewBox="0 0 24 24"
-                className="h-4.5 w-4.5"
-                width="18"
-                height="18"
+                className="h-6 w-6"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.8"
@@ -94,17 +92,29 @@ export default function SuccessModal({ open, data, onClose }: Props) {
                 <path d="M9 9l2 2-2 2M13 13h2" />
               </svg>
             </span>
-            <div className="flex-1">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-brand-orange">
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-bold uppercase tracking-[0.22em] text-brand-orange">
                 สิ่งที่ต้องเตรียม
               </p>
-              <p className="mt-1 text-sm font-medium text-ink leading-relaxed">
+              <p className="mt-2 text-base font-medium text-ink leading-relaxed">
                 กรุณาติดต่อ <span className="font-bold">แผนก IT</span>{' '}
-                เพื่อติดตั้งโปรแกรม{' '}
-                <span className="font-bold text-brand-orange whitespace-nowrap">
-                  ก่อนเรียนอย่างน้อย 1 วัน
-                </span>
+                เพื่อติดตั้งโปรแกรม
               </p>
+              <motion.p
+                initial={{ opacity: 0, scale: 0.92 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{
+                  delay: 0.85,
+                  type: 'spring',
+                  damping: 14,
+                  stiffness: 220,
+                }}
+                className="mt-4 text-2xl sm:text-3xl font-extrabold leading-tight tracking-tight text-balance"
+              >
+                <span className="text-gradient-warm bg-[length:200%_200%] animate-gradient-text">
+                  &ldquo;ก่อนเรียนอย่างน้อย 1 วัน&rdquo;
+                </span>
+              </motion.p>
             </div>
           </div>
         </motion.div>
