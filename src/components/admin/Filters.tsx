@@ -78,7 +78,7 @@ export default function Filters({
             <option value="">ทุกรุ่น</option>
             {selectedCourse?.batches.map((b) => (
               <option key={b.id} value={b.id}>
-                {b.label}
+                {b.label} • {b.date} • {b.time}
               </option>
             ))}
           </Select>

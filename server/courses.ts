@@ -23,6 +23,13 @@ export const COURSES: ServerCourse[] = [
     title: 'Vibe Coding (เขียนโค้ดด้วยความรู้สึก) by Claude Code',
     batches: [
       {
+        id: 'vibe-1',
+        label: 'รุ่น 1',
+        date: 'วันพุธที่ 29 เม.ย.',
+        time: '09.30 - 12.00 น.',
+        dateISO: '2026-04-29',
+      },
+      {
         id: 'vibe-2',
         label: 'รุ่น 2',
         date: 'วันพุธที่ 6 พ.ค.',

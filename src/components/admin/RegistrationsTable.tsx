@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Registration, RegistrationStatus } from '../../types';
 import { STATUS_ORDER, STATUS_LABEL } from '../../types';
+import { courses } from '../../data/courses';
 import StatusBadge from './StatusBadge';
 
 type Props = {
@@ -27,16 +28,17 @@ function truncate(s: string, n = 40) {
   return s.length > n ? `${s.slice(0, n)}…` : s;
 }
 
+function shortCourseTitle(courseId: string): string {
+  return courses.find((c) => c.id === courseId)?.shortTitle ?? courseId;
+}
+
 const HEADERS = [
   '#',
-  'วันที่ลงทะเบียน',
+  'คอร์ส / รุ่น / วันที่ลงทะเบียน',
   'ชื่อ',
-  'เบอร์โทร',
-  'อีเมล',
+  'อีเมล / เบอร์โทร',
   'บริษัท',
   'ตำแหน่ง',
-  'คอร์ส',
-  'รุ่น',
   'สถานะ',
   '',
 ];
@@ -57,7 +59,7 @@ export default function RegistrationsTable({
               {HEADERS.map((h) => (
                 <th
                   key={h}
-                  className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.16em] text-fg-muted whitespace-nowrap"
+                  className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.16em] text-fg-muted whitespace-nowrap align-top"
                 >
                   {h}
                 </th>
@@ -80,38 +82,48 @@ export default function RegistrationsTable({
                     className="group border-b border-line last:border-b-0 hover:bg-brand-purple/5 cursor-pointer transition-colors"
                     data-cursor="hover"
                   >
-                    <td className="px-4 py-3 font-mono text-xs text-fg-muted">
+                    <td className="px-4 py-3 font-mono text-xs text-fg-muted align-top">
                       {String(i + 1).padStart(3, '0')}
                     </td>
-                    <td className="px-4 py-3 font-mono text-xs text-fg-secondary whitespace-nowrap">
-                      {formatDate(r.createdAt)}
+
+                    {/* Course / Batch / Registered-at — merged 3-line cell */}
+                    <td className="px-4 py-3 align-top">
+                      <p className="font-semibold text-ink whitespace-nowrap">
+                        {shortCourseTitle(r.courseId)}
+                      </p>
+                      <p className="mt-0.5 text-xs text-fg-secondary whitespace-nowrap">
+                        {r.batchName}
+                      </p>
+                      <p className="mt-1 font-mono text-[11px] text-fg-muted whitespace-nowrap">
+                        {formatDate(r.createdAt)}
+                      </p>
                     </td>
-                    <td className="px-4 py-3 font-semibold text-ink whitespace-nowrap">
+
+                    <td className="px-4 py-3 font-semibold text-ink align-top whitespace-nowrap">
                       {r.fullName}
                     </td>
-                    <td className="px-4 py-3 font-mono text-xs text-fg-secondary whitespace-nowrap">
-                      {r.phone}
+
+                    {/* Email / Phone — merged 2-line cell */}
+                    <td className="px-4 py-3 align-top">
+                      <p className="text-xs text-fg-secondary whitespace-nowrap">
+                        {r.email}
+                      </p>
+                      <p className="mt-0.5 font-mono text-xs text-fg-secondary whitespace-nowrap">
+                        {r.phone}
+                      </p>
                     </td>
-                    <td className="px-4 py-3 text-xs text-fg-secondary whitespace-nowrap">
-                      {r.email}
-                    </td>
-                    <td className="px-4 py-3 text-xs text-fg-secondary">
+
+                    <td className="px-4 py-3 text-xs text-fg-secondary align-top">
                       {truncate(r.company || '—', 24)}
                     </td>
-                    <td className="px-4 py-3 text-xs text-fg-secondary">
+                    <td className="px-4 py-3 text-xs text-fg-secondary align-top">
                       {truncate(r.position || '—', 24)}
                     </td>
-                    <td className="px-4 py-3 text-xs text-fg-secondary">
-                      {truncate(r.courseName, 28)}
-                    </td>
-                    <td className="px-4 py-3 text-xs text-fg-secondary whitespace-nowrap">
-                      {r.batchName.split(' • ')[0]}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
+                    <td className="px-4 py-3 whitespace-nowrap align-top">
                       <StatusBadge status={r.status} size="sm" />
                     </td>
                     <td
-                      className="px-4 py-3 whitespace-nowrap"
+                      className="px-4 py-3 whitespace-nowrap align-top"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <div className="flex items-center gap-1.5">
@@ -151,12 +163,6 @@ export default function RegistrationsTable({
                             <path d="M3 4h10M6 4V3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1M5 4l.5 9a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1L11 4" />
                           </svg>
                         </button>
-                        <span
-                          aria-hidden
-                          className="ml-1 text-fg-muted opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          →
-                        </span>
                       </div>
                     </td>
                   </motion.tr>
