@@ -1,4 +1,4 @@
-import { courses } from '../../data/courses';
+import { useCourses } from '../../hooks/useCourses';
 import { STATUS_LABEL, STATUS_ORDER } from '../../types';
 import type { RegistrationStatus } from '../../types';
 import { Input, Select } from '../ui/Input';
@@ -26,6 +26,7 @@ export default function Filters({
   onStatus,
   onClear,
 }: Props) {
+  const { courses } = useCourses();
   const selectedCourse = courses.find((c) => c.id === courseId);
   const hasFilter = !!(search || courseId || batchId || status);
 

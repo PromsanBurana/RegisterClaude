@@ -14,12 +14,16 @@ import {
   type RegistrationStatus,
 } from './store.js';
 import {
-  COURSES,
+  getCoursesSync,
   findCourse,
   findBatch,
   batchDisplayName,
   isBatchPast,
-} from './courses.js';
+  addBatch,
+  removeBatch,
+  updateBatchInfo,
+  COURSES_PATH,
+} from './courseStore.js';
 import {
   attachUser,
   requireAuth,
@@ -79,6 +83,7 @@ function publicUser(u: {
 
 console.log(`[server] Registrations: ${STORE_PATH}`);
 console.log(`[server] Users:         ${USERS_PATH}`);
+console.log(`[server] Courses:       ${COURSES_PATH}`);
 
 // ---------- Auth ----------
 
@@ -109,6 +114,86 @@ app.get('/api/auth/me', attachUser, (req, res) => {
   res.json({ ok: true, user: publicUser(user) });
 });
 
+// ---------- Courses (public read + admin write) ----------
+
+app.get('/api/courses', (_req, res) => {
+  res.json(getCoursesSync());
+});
+
+app.post(
+  '/api/courses/:courseId/batches',
+  requireAuth,
+  requireRole('admin'),
+  async (req, res) => {
+    try {
+      const courseId = trim(req.params.courseId, 60);
+      const dateISO = trim(req.body?.dateISO, 10);
+      const label = trim(req.body?.label, 60);
+      const time = trim(req.body?.time, 60);
+      const date = trim(req.body?.date, 80);
+      if (!findCourse(courseId)) {
+        return res.status(400).json({ ok: false, error: 'invalid_course' });
+      }
+      const batch = await addBatch(courseId, { label, dateISO, time, date });
+      res.status(201).json(batch);
+    } catch (err) {
+      const msg = (err as Error).message;
+      if (msg === 'invalid_date' || msg === 'invalid_course') {
+        return res.status(400).json({ ok: false, error: msg });
+      }
+      console.error('[POST batch]', err);
+      res.status(500).json({ ok: false, error: 'internal_error' });
+    }
+  },
+);
+
+app.patch(
+  '/api/courses/:courseId/batches/:batchId',
+  requireAuth,
+  requireRole('admin'),
+  async (req, res) => {
+    try {
+      const courseId = trim(req.params.courseId, 60);
+      const batchId = trim(req.params.batchId, 100);
+      const patch = {
+        label: req.body?.label !== undefined ? trim(req.body.label, 60) : undefined,
+        date: req.body?.date !== undefined ? trim(req.body.date, 80) : undefined,
+        time: req.body?.time !== undefined ? trim(req.body.time, 60) : undefined,
+        dateISO:
+          req.body?.dateISO !== undefined ? trim(req.body.dateISO, 10) : undefined,
+      };
+      const updated = await updateBatchInfo(courseId, batchId, patch);
+      if (!updated) return res.status(404).json({ ok: false, error: 'not_found' });
+      res.json(updated);
+    } catch (err) {
+      const msg = (err as Error).message;
+      if (msg === 'invalid_date') {
+        return res.status(400).json({ ok: false, error: msg });
+      }
+      console.error('[PATCH batch]', err);
+      res.status(500).json({ ok: false, error: 'internal_error' });
+    }
+  },
+);
+
+app.delete(
+  '/api/courses/:courseId/batches/:batchId',
+  requireAuth,
+  requireRole('admin'),
+  async (req, res) => {
+    try {
+      const courseId = trim(req.params.courseId, 60);
+      const batchId = trim(req.params.batchId, 100);
+      const ok = await removeBatch(courseId, batchId);
+      if (!ok) return res.status(404).json({ ok: false, error: 'not_found' });
+      res.json({ ok: true });
+    } catch (err) {
+      console.error('[DELETE batch]', err);
+      res.status(500).json({ ok: false, error: 'internal_error' });
+    }
+  },
+);
+
 // ---------- Batch availability (public) ----------
 
 app.get('/api/batches', async (_req, res) => {
@@ -122,7 +207,7 @@ app.get('/api/batches', async (_req, res) => {
       available: number;
       isFull: boolean;
     }> = [];
-    for (const c of COURSES) {
+    for (const c of getCoursesSync()) {
       for (const b of c.batches) {
         // Hide past batches from the public availability feed entirely
         if (isBatchPast(b)) continue;

@@ -7,9 +7,11 @@ import {
   updateRegistrationStatus,
 } from '../api';
 import { useBatchAvailability } from '../hooks/useBatchAvailability';
+import { useCourses } from '../hooks/useCourses';
 import type { Registration, RegistrationStatus } from '../types';
-import { courses } from '../data/courses';
+import type { Course } from '../data/courses';
 import Container from '../components/ui/Container';
+import BatchManager from '../components/admin/BatchManager';
 import AdminHeader from '../components/admin/AdminHeader';
 import StatsCards from '../components/admin/StatsCards';
 import Filters from '../components/admin/Filters';
@@ -33,6 +35,7 @@ export default function Admin() {
   const [confirmDelete, setConfirmDelete] = useState<Registration | null>(null);
 
   const availability = useBatchAvailability();
+  const coursesCtx = useCourses();
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -67,7 +70,10 @@ export default function Admin() {
     });
   }, [data, search, courseFilter, batchFilter, statusFilter]);
 
-  const stats = useMemo(() => computeStats(data), [data]);
+  const stats = useMemo(
+    () => computeStats(data, coursesCtx.courses),
+    [data, coursesCtx.courses],
+  );
 
   const handleChangeStatus = async (
     id: string,
@@ -199,6 +205,8 @@ export default function Admin() {
               />
             </>
           )}
+
+          <BatchManager />
         </div>
       </Container>
 
@@ -345,7 +353,7 @@ function localDate(iso: string): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-function computeStats(data: Registration[]) {
+function computeStats(data: Registration[], courses: Course[]) {
   const today = localDate(new Date().toISOString());
   let vibe = 0;
   let cowork = 0;

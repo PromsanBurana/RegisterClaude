@@ -1,3 +1,4 @@
+import type { Batch, Course } from './data/courses';
 import type {
   AuthUser,
   BatchAvailability,
@@ -62,6 +63,63 @@ export async function me(): Promise<AuthUser | null> {
   if (!res.ok) throw new ApiError(`HTTP ${res.status}`, res.status);
   const body = (await res.json()) as { user: AuthUser };
   return body.user;
+}
+
+// ---------- Courses (public read + admin write) ----------
+
+export async function getCourses(): Promise<Course[]> {
+  return parse<Course[]>(await fetch('/api/courses', credOpts));
+}
+
+export type BatchInput = {
+  label?: string;
+  dateISO: string;
+  time?: string;
+  date?: string;
+};
+
+export async function addCourseBatch(
+  courseId: string,
+  input: BatchInput,
+): Promise<Batch> {
+  return parse<Batch>(
+    await fetch(`/api/courses/${encodeURIComponent(courseId)}/batches`, {
+      ...credOpts,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    }),
+  );
+}
+
+export async function updateCourseBatch(
+  courseId: string,
+  batchId: string,
+  patch: Partial<BatchInput>,
+): Promise<Batch> {
+  return parse<Batch>(
+    await fetch(
+      `/api/courses/${encodeURIComponent(courseId)}/batches/${encodeURIComponent(batchId)}`,
+      {
+        ...credOpts,
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(patch),
+      },
+    ),
+  );
+}
+
+export async function deleteCourseBatch(
+  courseId: string,
+  batchId: string,
+): Promise<{ ok: boolean }> {
+  return parse<{ ok: boolean }>(
+    await fetch(
+      `/api/courses/${encodeURIComponent(courseId)}/batches/${encodeURIComponent(batchId)}`,
+      { ...credOpts, method: 'DELETE' },
+    ),
+  );
 }
 
 // ---------- Batch availability (public) ----------

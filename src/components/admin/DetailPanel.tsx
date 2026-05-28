@@ -4,7 +4,8 @@ import StatusBadge from './StatusBadge';
 import SidePanel from '../ui/SidePanel';
 import Button from '../ui/Button';
 import { Select } from '../ui/Input';
-import { courses, isBatchPast } from '../../data/courses';
+import { isBatchPast } from '../../data/courses';
+import { useCourses } from '../../hooks/useCourses';
 import {
   describeAvailability,
   type AvailabilityHelper,
@@ -129,6 +130,7 @@ function MoveBatchPanel({
   availability: AvailabilityHelper;
   onMove: Props['onMove'];
 }) {
+  const { courses } = useCourses();
   const options = useMemo<Option[]>(() => {
     const list: Option[] = [];
     for (const c of courses) {
@@ -152,7 +154,7 @@ function MoveBatchPanel({
       }
     }
     return list;
-  }, [availability, registration]);
+  }, [availability, courses, registration]);
 
   const [target, setTarget] = useState<string>('');
   const [submitting, setSubmitting] = useState(false);

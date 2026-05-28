@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Registration, RegistrationStatus } from '../../types';
 import { STATUS_ORDER, STATUS_LABEL } from '../../types';
-import { courses } from '../../data/courses';
+import { useCourses } from '../../hooks/useCourses';
 import StatusBadge from './StatusBadge';
 
 type Props = {
@@ -28,8 +28,9 @@ function truncate(s: string, n = 40) {
   return s.length > n ? `${s.slice(0, n)}…` : s;
 }
 
-function shortCourseTitle(courseId: string): string {
-  return courses.find((c) => c.id === courseId)?.shortTitle ?? courseId;
+function makeShortCourseTitle(courses: ReturnType<typeof useCourses>['courses']) {
+  return (courseId: string): string =>
+    courses.find((c) => c.id === courseId)?.shortTitle ?? courseId;
 }
 
 const HEADERS = [
@@ -50,6 +51,8 @@ export default function RegistrationsTable({
   onDelete,
   pendingId,
 }: Props) {
+  const { courses } = useCourses();
+  const shortCourseTitle = makeShortCourseTitle(courses);
   return (
     <div className="rounded-2xl border border-line bg-surface overflow-hidden shadow-soft">
       <div className="overflow-x-auto">

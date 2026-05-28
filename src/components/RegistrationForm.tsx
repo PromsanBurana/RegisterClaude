@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, forwardRef } from 'react';
 import { motion } from 'framer-motion';
-import { courses, findCourseById, isBatchPast } from '../data/courses';
+import { isBatchPast } from '../data/courses';
+import { useCourses } from '../hooks/useCourses';
 import { createRegistration, ApiError } from '../api';
 import Container from './ui/Container';
 import Section from './ui/Section';
@@ -46,6 +47,7 @@ type Props = {
 
 const RegistrationForm = forwardRef<HTMLElement, Props>(
   ({ selectedCourseId, onSuccess, availability }, ref) => {
+    const { courses } = useCourses();
     const [data, setData] = useState<RegistrationData>(initialData);
     const [errors, setErrors] = useState<Errors>({});
     const [touched, setTouched] = useState<Partial<Record<keyof RegistrationData, boolean>>>({});
@@ -60,8 +62,8 @@ const RegistrationForm = forwardRef<HTMLElement, Props>(
     }, [selectedCourseId]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const selectedCourse = useMemo(
-      () => findCourseById(data.courseId),
-      [data.courseId],
+      () => courses.find((c) => c.id === data.courseId),
+      [courses, data.courseId],
     );
 
     const validateField = <K extends keyof RegistrationData>(

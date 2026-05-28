@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { findCourseById } from '../data/courses';
+import { useCourses } from '../hooks/useCourses';
 import type { RegistrationData } from './RegistrationForm';
 import Modal from './ui/Modal';
 import Button from './ui/Button';
@@ -12,7 +12,8 @@ type Props = {
 };
 
 export default function SuccessModal({ open, data, onClose }: Props) {
-  const course = data ? findCourseById(data.courseId) : null;
+  const { courses } = useCourses();
+  const course = data ? courses.find((c) => c.id === data.courseId) : null;
   const batch = course?.batches.find((b) => b.id === data?.batchId);
 
   return (

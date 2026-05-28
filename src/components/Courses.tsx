@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
-import { courses, type Course, upcomingBatches } from '../data/courses';
+import { type Course, upcomingBatches } from '../data/courses';
+import { useCourses } from '../hooks/useCourses';
 import Container from './ui/Container';
 import Section from './ui/Section';
 import SectionHeader from './ui/SectionHeader';
@@ -42,6 +43,7 @@ const ACCENTS = [
 ];
 
 export default function Courses({ onSelect, availability }: Props) {
+  const { courses } = useCourses();
   return (
     <>
       <MarqueeText
