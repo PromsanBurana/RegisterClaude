@@ -77,6 +77,33 @@ function readSafe(): CoursesData {
 
 let cache: CoursesData = readSafe();
 
+// Boot-time normalization: if the on-disk file was written by an older
+// build (or hand-edited) and now has gaps in the sequential "รุ่น N"
+// labels, fix them once on startup so admin / public views are aligned.
+{
+  let changed = false;
+  const normalized: CoursesData = {};
+  for (const courseId of Object.keys(cache)) {
+    const before = cache[courseId];
+    const after = renumberThaiLabels(before);
+    normalized[courseId] = after;
+    if (JSON.stringify(before) !== JSON.stringify(after)) changed = true;
+  }
+  if (changed) {
+    cache = normalized;
+    try {
+      fs.writeFileSync(
+        COURSES_PATH,
+        JSON.stringify(cache, null, 2),
+        'utf8',
+      );
+      console.log('[courseStore] Normalized รุ่น labels on boot');
+    } catch (err) {
+      console.warn('[courseStore] Failed to persist boot-normalization', err);
+    }
+  }
+}
+
 async function writeAtomic(data: CoursesData): Promise<void> {
   const tmp = `${COURSES_PATH}.${process.pid}.${Date.now()}.tmp`;
   await fs.promises.writeFile(tmp, JSON.stringify(data, null, 2), 'utf8');
