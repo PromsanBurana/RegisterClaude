@@ -1,4 +1,4 @@
-import type { Batch, Course } from './data/courses';
+import type { Batch } from './data/courses';
 import type {
   AuthUser,
   BatchAvailability,
@@ -67,8 +67,21 @@ export async function me(): Promise<AuthUser | null> {
 
 // ---------- Courses (public read + admin write) ----------
 
-export async function getCourses(): Promise<Course[]> {
-  return parse<Course[]>(await fetch('/api/courses', credOpts));
+/**
+ * What the server returns — only id/title/batches. Frontend keeps the
+ * richer Course metadata (highlights, audience, etc.) in its static
+ * defaults and merges in the server batches at runtime.
+ */
+export type ServerCourseResponse = {
+  id: string;
+  title: string;
+  batches: Batch[];
+};
+
+export async function getCourses(): Promise<ServerCourseResponse[]> {
+  return parse<ServerCourseResponse[]>(
+    await fetch('/api/courses', credOpts),
+  );
 }
 
 export type BatchInput = {

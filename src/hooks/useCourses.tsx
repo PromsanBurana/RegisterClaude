@@ -34,8 +34,18 @@ export function CoursesProvider({ children }: { children: ReactNode }) {
   const refresh = useCallback(async () => {
     try {
       const list = await getCourses();
-      // Defensive: never set to an empty array if the server returns nothing
-      if (Array.isArray(list) && list.length > 0) setCourses(list);
+      if (!Array.isArray(list) || list.length === 0) return;
+      // Merge: keep the bundled static metadata (highlights, audience,
+      // accent, icon, …) and only swap in `batches` from the server.
+      // This avoids `undefined.map` crashes when consumers reach for
+      // metadata fields that the server never sends.
+      const merged: Course[] = DEFAULT_COURSES.map((defaultCourse) => {
+        const fromServer = list.find((c) => c.id === defaultCourse.id);
+        return fromServer
+          ? { ...defaultCourse, batches: fromServer.batches }
+          : defaultCourse;
+      });
+      setCourses(merged);
     } catch (err) {
       console.warn('[courses] fetch failed, using bundled defaults', err);
     } finally {
