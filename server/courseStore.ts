@@ -159,6 +159,29 @@ function thaiDateString(iso: string): string {
   return `${THAI_DAYS[d.getDay()]}ที่ ${d.getDate()} ${THAI_MONTHS[d.getMonth()]}`;
 }
 
+/**
+ * Sort batches chronologically and re-assign sequential "รุ่น N" labels
+ * to any entry whose label already follows that pattern. Custom labels
+ * like "Special session" or "รุ่น 99 (private)" are left untouched.
+ *
+ * This is invoked after every mutation so deleting a middle batch
+ * naturally shifts the remaining ones up.
+ */
+function renumberThaiLabels(batches: ServerBatch[]): ServerBatch[] {
+  const sorted = [...batches].sort((a, b) =>
+    a.dateISO.localeCompare(b.dateISO),
+  );
+  let n = 0;
+  return sorted.map((b) => {
+    if (/^รุ่น\s*\d+$/.test(b.label.trim())) {
+      n += 1;
+      const newLabel = `รุ่น ${n}`;
+      return newLabel === b.label ? b : { ...b, label: newLabel };
+    }
+    return b;
+  });
+}
+
 const DEFAULT_TIME = '09.30 - 12.00 น.';
 const ISO_RE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -202,12 +225,11 @@ export function addBatch(
       dateISO: input.dateISO,
     };
 
-    const updated = [...existing, batch].sort((a, b) =>
-      a.dateISO.localeCompare(b.dateISO),
-    );
+    const updated = renumberThaiLabels([...existing, batch]);
     data[courseId] = updated;
     await writeAtomic(data);
-    return batch;
+    // Label may have shifted if the new batch slotted into the middle
+    return updated.find((b) => b.id === batch.id) || batch;
   });
 }
 
@@ -244,7 +266,10 @@ export function removeBatch(
     for (const key of Object.keys(cache)) data[key] = cache[key].slice();
     const existing = data[courseId] || [];
     if (!existing.find((b) => b.id === batchId)) return false;
-    data[courseId] = existing.filter((b) => b.id !== batchId);
+    const remaining = existing.filter((b) => b.id !== batchId);
+    // Shift sequential รุ่น labels up so e.g. deleting รุ่น 5
+    // turns รุ่น 6 / 7 into รุ่น 5 / 6.
+    data[courseId] = renumberThaiLabels(remaining);
     await writeAtomic(data);
     return true;
   });
@@ -283,10 +308,9 @@ export function updateBatchInfo(
 
     const updated = existing.slice();
     updated[idx] = next;
-    data[courseId] = updated.sort((a, b) =>
-      a.dateISO.localeCompare(b.dateISO),
-    );
+    data[courseId] = renumberThaiLabels(updated);
     await writeAtomic(data);
-    return next;
+    // Re-fetch the (possibly re-labeled) updated batch by id
+    return data[courseId].find((b) => b.id === batchId) || next;
   });
 }
